@@ -4,6 +4,7 @@
 const path = require("path")
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
+const staticRoutes = require("./routes/static")
 
 const app = express()
 
@@ -11,15 +12,17 @@ const app = express()
  * View Engine and Templates
  * ***************************************** */
 app.set("view engine", "ejs")
-app.set("views", path.join(__dirname, "views")) // explicit, safe
+app.set("views", path.join(__dirname, "views"))
 app.use(expressLayouts)
-app.set("layout", "layouts/layout") // not at views root
-
-// Serve static files from /public (CSS, images, JS)
-app.use(express.static(path.join(__dirname, "public")))
+app.set("layout", "layouts/layout")
 
 /* ******************************************
- * Default GET route
+ * Static Routes
+ * ***************************************** */
+app.use(staticRoutes)
+
+/* ******************************************
+ * Index Route
  * ***************************************** */
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" })
@@ -29,7 +32,7 @@ app.get("/", (req, res) => {
  * Server host name and port
  * ***************************************** */
 const HOST = "localhost"
-const PORT = 3000
+const PORT = 5500
 
 /* ***********************
  * Log statement to confirm server operation
