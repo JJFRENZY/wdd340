@@ -1,12 +1,14 @@
-views/
-  layouts/
-    layout.ejs
-  partials/
-    head.ejs
-    header.ejs
-    navigation.ejs
-    footer.ejs
-  index.ejs
-public/
-  css/
-    styles.css
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include("partials/head", { title }) %>
+  </head>
+  <body>
+    <%- include("partials/header") %>
+    <%- include("partials/navigation") %>
+    <main class="container">
+      <%- body %>
+    </main>
+    <%- include("partials/footer") %>
+  </body>
+</html>

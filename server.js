@@ -31,12 +31,12 @@ app.get("/", (req, res) => {
 /* ******************************************
  * Server host name and port
  * ***************************************** */
-const HOST = "localhost"
-const PORT = 5500
+const PORT = process.env.PORT || 5500
+const HOST = process.env.HOST || "localhost"
 
 /* ***********************
  * Log statement to confirm server operation
  * *********************** */
 app.listen(PORT, () => {
-  console.log(`trial app listening on ${HOST}:${PORT}`)
+  console.log(`trial app listening on http://${HOST}:${PORT}`)
 })
