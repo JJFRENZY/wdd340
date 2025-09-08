@@ -1,42 +1,27 @@
-/* ******************************************
- * This is the application server
- * ******************************************/
-const path = require("path")
-const express = require("express")
-const expressLayouts = require("express-ejs-layouts")
-const staticRoutes = require("./routes/static")
+// server.js (CommonJS)
+const path = require('path');
+const express = require('express');
 
-const app = express()
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-/* ******************************************
- * View Engine and Templates
- * ***************************************** */
-app.set("view engine", "ejs")
-app.set("views", path.join(__dirname, "views"))
-app.use(expressLayouts)
-app.set("layout", "layouts/layout")
+// View engine: EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-/* ******************************************
- * Static Routes
- * ***************************************** */
-app.use(staticRoutes)
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-/* ******************************************
- * Index Route
- * ***************************************** */
-app.get("/", (req, res) => {
-  res.render("index", { title: "Home" })
-})
+// Routes
+app.get('/', (req, res) => {
+  res.render('index', { title: 'CSE Motors' });
+});
 
-/* ******************************************
- * Server host name and port
- * ***************************************** */
-const PORT = process.env.PORT || 5500
-const HOST = process.env.HOST || "localhost"
+// 404 fallback (optional)
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
 
-/* ***********************
- * Log statement to confirm server operation
- * *********************** */
 app.listen(PORT, () => {
-  console.log(`trial app listening on http://${HOST}:${PORT}`)
-})
+  console.log(`CSE Motors running: http://localhost:${PORT}`);
+});

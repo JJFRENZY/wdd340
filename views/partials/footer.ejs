@@ -1,4 +1,18 @@
-<% const year = new Date().getFullYear(); %>
-<footer>
-  <p class="copyright">&copy; <%= year %>, CSE 340 App</p>
+<footer class="site-footer" role="contentinfo">
+  <div class="wrap">
+    <p>&copy; <span id="year"></span> CSE Motors. All rights reserved.</p>
+    <address>
+      1234 Motor Way, Rexburg, ID 83440 · <a href="tel:+12085550123">(208) 555-0123</a>
+    </address>
+  </div>
 </footer>
+
+<script>
+  // Set year without extra build tools
+  (function () {
+    const el = document.getElementById('year');
+    if (el) el.textContent = new Date().getFullYear();
+  })();
+</script>
+</body>
+</html>

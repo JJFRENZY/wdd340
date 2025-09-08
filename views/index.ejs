@@ -1,46 +1,106 @@
-<main id="main-content">
-  <!-- Hero -->
+<%- include('partials/_head') %>
+<%- include('partials/_header') %>
+<%- include('partials/_nav') %>
+
+<main id="main" class="home" tabindex="-1">
+
+  <!-- Hero Section -->
   <section class="hero" aria-labelledby="hero-heading">
-    <img
-      class="hero-img"
-      src="/images/hero.jpg"
-      alt="Showroom vehicle at CSE Motors"
-    />
-    <div class="hero-text">
-      <h1 id="hero-heading">CSE Motors</h1>
-      <p>Quality vehicles. Transparent pricing.</p>
-      <a class="btn btn-primary" href="/inventory">Shop Inventory</a>
+    <div class="hero-media">
+      <!-- Uses your SVG hero -->
+      <img
+        src="/images/hero.svg"
+        alt="Showroom scene with a stylized car silhouette"
+        width="1600"
+        height="900"
+      />
+    </div>
+    <div class="hero-copy">
+      <h1 id="hero-heading">Your Next Ride Awaits</h1>
+      <p>Explore our curated selection of cars, trucks, and SUVs. Transparent pricing. Friendly experts.</p>
+      <a class="btn primary" href="#inventory">Browse Inventory</a>
     </div>
   </section>
 
-  <!-- Shopping tools -->
-  <section class="promo-cards" aria-labelledby="tools">
-    <h2 id="tools" class="visually-hidden">Shopping tools</h2>
-    <div class="card-grid">
-      <article class="card">
-        <img src="/images/new.jpg" alt="Row of new cars" />
+  <!-- Optional anchor target for the hero button -->
+  <div id="inventory" aria-hidden="true"></div>
+
+  <!-- Specials -->
+  <section id="specials" class="specials" aria-labelledby="specials-heading">
+    <h2 id="specials-heading">This Week’s Specials</h2>
+    <ul class="card-grid" role="list">
+      <li class="card">
+        <img
+          src="/images/specials-sedan.svg"
+          alt="Illustration of a sleek sedan"
+          width="800"
+          height="600"
+          loading="lazy"
+        />
         <div class="card-body">
-          <h3>New Vehicles</h3>
-          <p>Explore the latest models.</p>
-          <a class="btn btn-secondary" href="/inventory?type=new">Browse New</a>
+          <h3>Comfort Sedan</h3>
+          <p>Fuel-efficient daily driver with advanced safety features.</p>
+          <a class="btn" href="#inventory">View Details</a>
         </div>
-      </article>
-      <article class="card">
-        <img src="/images/used.jpg" alt="Pre-owned car lot" />
+      </li>
+
+      <li class="card">
+        <img
+          src="/images/specials-suv.svg"
+          alt="Illustration of a spacious SUV"
+          width="800"
+          height="600"
+          loading="lazy"
+        />
         <div class="card-body">
-          <h3>Used Vehicles</h3>
-          <p>Reliable and inspected.</p>
-          <a class="btn btn-secondary" href="/inventory?type=used">Browse Used</a>
+          <h3>Family SUV</h3>
+          <p>Room for everyone and everything with modern tech.</p>
+          <a class="btn" href="#inventory">View Details</a>
         </div>
-      </article>
-      <article class="card">
-        <img src="/images/service.jpg" alt="Mechanic servicing a vehicle" />
+      </li>
+
+      <li class="card">
+        <img
+          src="/images/specials-truck.svg"
+          alt="Illustration of a capable work truck"
+          width="800"
+          height="600"
+          loading="lazy"
+        />
         <div class="card-body">
-          <h3>Service &amp; Parts</h3>
-          <p>Keep your car in top shape.</p>
-          <a class="btn btn-secondary" href="/service">Schedule Service</a>
+          <h3>Workhorse Truck</h3>
+          <p>Power, payload, and reliability for tough jobs.</p>
+          <a class="btn" href="#inventory">View Details</a>
         </div>
-      </article>
-    </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Value Props -->
+  <section class="value-props" aria-labelledby="value-heading">
+    <h2 id="value-heading">Why Choose CSE Motors?</h2>
+    <ul class="prop-list" role="list">
+      <li>
+        <h3>Transparent Pricing</h3>
+        <p>No hidden fees. Upfront, honest quotes.</p>
+      </li>
+      <li>
+        <h3>Certified Service</h3>
+        <p>Factory-trained technicians and genuine parts.</p>
+      </li>
+      <li>
+        <h3>Financing Options</h3>
+        <p>Competitive rates tailored to your needs.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Contact CTA -->
+  <section id="contact" class="contact-cta" aria-labelledby="contact-heading">
+    <h2 id="contact-heading">Ready for a Test Drive?</h2>
+    <p>Call us at <a href="tel:+12085550123">(208) 555-0123</a> or stop by our showroom today.</p>
+    <a class="btn outline" href="#contact">Get Directions</a>
   </section>
 </main>
+
+<%- include('partials/_footer') %>
