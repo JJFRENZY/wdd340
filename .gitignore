@@ -1,18 +1,41 @@
-# Each item listed in this file will be ignored by git
-# and will not be uploaded to github. The blank lines
-# and comments are unnecessary, but included for 
-# clarification.
+# ── Node / Package Managers ───────────────────────────────
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml    # keep if you want lockfile tracked; otherwise ignore it
+.pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# node_modules is a storage folder for Node and
-# can get very large.
-node_modules
-
-# .env file is for local use only. It contains
-# values not to be shared and most of the values
-# will be manually created by you or dynamically # created on the hosting server
+# ── Env / Local Config ────────────────────────────────────
 .env
+.env.*
+*.local
 
-# .DS_Store is only for Mac users
-**/.DS_Store
+# ── Logs / Coverage / Caches ──────────────────────────────
+logs/
+*.log
+coverage/
+.cache/
+.tmp/
+.vite/
+vite-cache/
 
-README.md
+# ── Build Artifacts (if any) ──────────────────────────────
+dist/
+build/
+
+# ── OS / Editors ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Misc ──────────────────────────────────────────────────
+# Ignore Render/Vercel local artifacts if you generate any
+.vercel/
+.render/
