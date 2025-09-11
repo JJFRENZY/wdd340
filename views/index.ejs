@@ -1,13 +1,12 @@
-<%- include('partials/_head') %>
-<%- include('partials/_header') %>
-<%- include('partials/_nav') %>
+<%- include('partials/head.ejs') %>
+<%- include('partials/header.ejs') %>
+<%- include('partials/nav.ejs') %>
 
 <main id="main" class="home" tabindex="-1">
 
   <!-- Hero Section -->
   <section class="hero" aria-labelledby="hero-heading">
     <div class="hero-media">
-      <!-- Uses your SVG hero -->
       <img
         src="/images/hero.svg"
         alt="Showroom scene with a stylized car silhouette"
@@ -22,7 +21,6 @@
     </div>
   </section>
 
-  <!-- Optional anchor target for the hero button -->
   <div id="inventory" aria-hidden="true"></div>
 
   <!-- Specials -->
@@ -103,4 +101,4 @@
   </section>
 </main>
 
-<%- include('partials/_footer') %>
+<%- include('partials/footer.ejs') %>
