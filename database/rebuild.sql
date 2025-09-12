@@ -4,6 +4,9 @@
 -- Idempotent: safe to run multiple times
 -- ======================================================
 
+-- Ensure we’re in the public schema
+SET search_path = public;
+
 BEGIN;
 
 -- ---------- Clean slate ----------
@@ -13,7 +16,7 @@ DROP TABLE IF EXISTS account          CASCADE;
 DROP TYPE  IF EXISTS account_type     CASCADE;
 
 -- ---------- Type ----------
--- Enum for account.account_type with default 'Client'
+-- Enum for account.account_type (default will be 'Client' on the table)
 CREATE TYPE account_type AS ENUM ('Admin','Client','Employee');
 
 -- ---------- Tables ----------
@@ -53,7 +56,7 @@ CREATE TABLE inventory (
 );
 
 -- ---------- Seed Data ----------
--- Classification rows (adjust to match your course list if needed)
+-- Classification rows
 INSERT INTO classification (classification_name) VALUES
   ('Sedan'),
   ('SUV'),
@@ -65,13 +68,13 @@ ON CONFLICT (classification_name) DO NOTHING;
 -- Helper: get IDs by name
 WITH ids AS (
   SELECT
-    (SELECT classification_id FROM classification WHERE classification_name='Sedan')  AS sedan_id,
-    (SELECT classification_id FROM classification WHERE classification_name='SUV')    AS suv_id,
-    (SELECT classification_id FROM classification WHERE classification_name='Truck')  AS truck_id,
-    (SELECT classification_id FROM classification WHERE classification_name='Sport')  AS sport_id,
-    (SELECT classification_id FROM classification WHERE classification_name='Utility')AS util_id
+    (SELECT classification_id FROM classification WHERE classification_name='Sedan')   AS sedan_id,
+    (SELECT classification_id FROM classification WHERE classification_name='SUV')     AS suv_id,
+    (SELECT classification_id FROM classification WHERE classification_name='Truck')   AS truck_id,
+    (SELECT classification_id FROM classification WHERE classification_name='Sport')   AS sport_id,
+    (SELECT classification_id FROM classification WHERE classification_name='Utility') AS util_id
 )
--- Inventory rows (include a GM Hummer with "small interiors" to satisfy Task 1 #4)
+-- Inventory rows (include GM Hummer with "small interiors" for Task 1 #4)
 INSERT INTO inventory (
   inv_make, inv_model, inv_year, inv_description,
   inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id
@@ -96,7 +99,7 @@ SELECT
   '/images/tundra.jpg', '/images/tundra-tn.jpg', 42999.00, 25000, 'Black', ids.truck_id
 FROM ids;
 
--- ---------- (At the very end) Run copies of Task 1 queries #4 and #6 ----------
+-- ---------- As required: copies of Task 1 queries #4 and #6 LAST ----------
 -- #4 Replace "small interiors" -> "a huge interior" for GM Hummer
 UPDATE inventory
    SET inv_description = REPLACE(inv_description, 'small interiors', 'a huge interior')
@@ -111,5 +114,5 @@ UPDATE inventory
 COMMIT;
 
 -- Quick checks (optional):
--- SELECT * FROM classification ORDER BY classification_id;
+-- SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;
 -- SELECT inv_make, inv_model, inv_description, inv_image, inv_thumbnail FROM inventory ORDER BY inv_id;
