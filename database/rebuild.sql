@@ -4,7 +4,7 @@
 -- Idempotent: safe to run multiple times
 -- ======================================================
 
--- Ensure we’re in the public schema
+-- Ensure we use the public schema
 SET search_path = public;
 
 BEGIN;
@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS account          CASCADE;
 DROP TYPE  IF EXISTS account_type     CASCADE;
 
 -- ---------- Type ----------
--- Enum for account.account_type (default will be 'Client' on the table)
+-- Enum for account.account_type (table default will be 'Client')
 CREATE TYPE account_type AS ENUM ('Admin','Client','Employee');
 
 -- ---------- Tables ----------

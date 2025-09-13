@@ -3,7 +3,7 @@
 -- File: database/assignment2.sql
 -- ===========================================
 
--- Make sure we’re using the public schema
+-- Ensure we use the public schema
 SET search_path = public;
 
 -- 1) Insert Tony Stark (account_id + account_type handled by defaults)
