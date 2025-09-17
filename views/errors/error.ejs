@@ -1,0 +1,23 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs') %>
+
+<main id="main" class="error" tabindex="-1">
+  <h1><%= title %></h1>
+  <!-- Unescaped so we can pass simple markup if desired -->
+  <p class="error-msg"><%- message %></p>
+
+  <p><a class="btn" href="/">← Back to Home</a></p>
+
+  <!-- Optional: friendly hint -->
+  <details>
+    <summary>Troubleshooting tips</summary>
+    <ul>
+      <li>Check the URL spelling.</li>
+      <li>Return to the home page and navigate again.</li>
+      <li>If this keeps happening, contact us.</li>
+    </ul>
+  </details>
+</main>
+
+<%- include('../partials/footer.ejs') %>
