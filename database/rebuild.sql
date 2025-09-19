@@ -109,7 +109,7 @@ UPDATE inventory
    AND inv_model = 'Hummer'
    AND inv_description LIKE '%small interiors%';
 
--- #6 Prefix image paths with /images/vehicles (guarded, all rows as needed)
+-- #6 Prefix image paths with /images/vehicles (intentional all-rows update)
 UPDATE inventory
    SET inv_image     = REGEXP_REPLACE(inv_image,     '^/images/(?!vehicles/)', '/images/vehicles/'),
        inv_thumbnail = REGEXP_REPLACE(inv_thumbnail, '^/images/(?!vehicles/)', '/images/vehicles/')
@@ -117,10 +117,3 @@ UPDATE inventory
     OR inv_thumbnail LIKE '/images/%';
 
 COMMIT;
-
--- Quick checks (optional):
--- SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name;
--- SELECT COUNT(*) AS inventory_count FROM inventory;  -- expect 15
--- SELECT i.inv_make,i.inv_model,c.classification_name
---   FROM inventory i JOIN classification c USING (classification_id)
---  WHERE c.classification_name='Sport' ORDER BY 1,2;  -- expect 2 rows
