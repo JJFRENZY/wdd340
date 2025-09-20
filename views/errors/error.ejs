@@ -1,23 +1,35 @@
 <%- include('../partials/head.ejs', { title }) %>
 <%- include('../partials/header.ejs') %>
-<%- include('../partials/nav.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
 
-<main id="main" class="error" tabindex="-1">
-  <h1><%= title %></h1>
-  <!-- Unescaped so we can pass simple markup if desired -->
-  <p class="error-msg"><%- message %></p>
+<main id="main" class="error container" tabindex="-1">
+  <h1>Error <%= title %></h1>
 
-  <p><a class="btn" href="/">← Back to Home</a></p>
+  <!-- Announce immediately to assistive tech -->
+  <p class="error-msg" role="alert"><%- message %></p>
 
-  <!-- Optional: friendly hint -->
+  <p>
+    <a class="btn" href="javascript:history.back()">← Go Back</a>
+    <a class="btn outline" href="/">Home</a>
+  </p>
+
+  <!-- Optional tips for users -->
   <details>
     <summary>Troubleshooting tips</summary>
     <ul>
       <li>Check the URL spelling.</li>
       <li>Return to the home page and navigate again.</li>
-      <li>If this keeps happening, contact us.</li>
+      <li>If this keeps happening, please contact us.</li>
     </ul>
   </details>
+
+  <!-- Optional: show extra details in dev if provided -->
+  <% if (typeof err !== 'undefined' && err && err.stack) { %>
+    <details open>
+      <summary>Developer details</summary>
+      <pre><%= err.stack %></pre>
+    </details>
+  <% } %>
 </main>
 
 <%- include('../partials/footer.ejs') %>

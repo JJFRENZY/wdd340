@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title><%= title %> | CSE Motors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- Header / site chrome -->
+  <%- include('/partials/header') %>
+
+  <!-- Main navigation built from DB -->
+  <nav aria-label="Main Navigation" class="site-nav">
+    <%- nav %>
+  </nav>
+
+  <!-- Main content -->
+  <main id="main" tabindex="-1" class="container">
+    <h1 id="veh-h1"><%= title %></h1>
+
+    <!-- Vehicle detail block (built in utilities.buildVehicleDetailHtml) -->
+    <%- detailHtml %>
+  </main>
+
+  <!-- Footer (contains the 500-error test link) -->
+  <%- include('/partials/footer') %>
+</body>
+</html>

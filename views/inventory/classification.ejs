@@ -3,23 +3,13 @@
 <%- include('../partials/nav.ejs', { nav }) %>
 
 <main id="main" class="inventory classification" tabindex="-1">
-  <!-- ============================= -->
-  <!-- Content Heading              -->
-  <!-- ============================= -->
-  <% if (title) { %>
-    <h1><%= title %></h1>
-  <% } else {
-    res.redirect('/')
-  } %>
+  <!-- Page heading -->
+  <h1><%= title || 'Vehicles' %></h1>
 
-  <!-- ============================= -->
-  <!-- Message Block (future use)    -->
-  <!-- ============================= -->
+  <!-- Message block (optional for flash/messages) -->
   <%# messages() %>
 
-  <!-- ============================= -->
-  <!-- Inventory Items Display       -->
-  <!-- ============================= -->
+  <!-- Inventory grid -->
   <section aria-labelledby="grid-heading" class="inventory-grid">
     <h2 id="grid-heading" class="sr-only">Vehicles</h2>
     <%- grid %>

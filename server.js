@@ -1,75 +1,97 @@
 // server.js (CommonJS)
-const path = require('path');
-const express = require('express');
-const asyncHandler = require('./utilities/asyncHandler'); // higher-order error wrapper
-const baseController = require('./controllers/baseController'); // your home controller
-const inventoryRoute = require('./routes/inventoryRoute'); // <-- NEW
+const path = require("path");
+const express = require("express");
+const asyncHandler = require("./utilities/asyncHandler");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute");
+const utilities = require("./utilities"); // for getNav() in error handler
+
+// Optionally load env vars in dev
+try { require("dotenv").config(); } catch (_) {}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// View engine: EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+/* ======================
+ * View engine: EJS
+ * ====================== */
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+// Allow absolute EJS includes like include('/partials/...ejs')
+app.locals.basedir = path.join(__dirname, "views");
 
-// ✅ Allow absolute include paths like include('/partials/_head.ejs')
-app.locals.basedir = path.join(__dirname, 'views');
+/* ======================
+ * Static assets
+ * ====================== */
+app.use(express.static(path.join(__dirname, "public")));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+/* ======================
+ * Routes
+ * ====================== */
 
-// -------------------- Routes --------------------
+// Home
+app.get("/", asyncHandler(baseController.buildHome));
 
-// Index route — MVC controller method
-app.get('/', asyncHandler(baseController.buildHome));
+// Inventory routes (classification, detail, 500 trigger)
+app.use("/inv", inventoryRoute);
 
-// Inventory routes
-app.use('/inv', inventoryRoute);
-
-// Optional: a test route that throws
+// Optional: quick test route to throw a custom error
 app.get(
-  '/kaboom',
-  asyncHandler(async (req, res) => {
-    const err = new Error('Test explosion 💥');
-    err.status = 418;
+  "/kaboom",
+  asyncHandler(async (_req, _res) => {
+    const err = new Error("Test explosion 💥");
+    err.status = 418; // I'm a teapot
     throw err;
   })
 );
 
-// -------------------- 404 + Error handlers --------------------
-
-// 404: create an Error and pass to the centralized error handler
-app.use((req, res, next) => {
-  const err = new Error('File Not Found');
+/* ======================
+ * 404 handler
+ * ====================== */
+app.use((req, _res, next) => {
+  const err = new Error("File Not Found");
   err.status = 404;
   next(err);
 });
 
-/* ***********************
- * Express Error Handler
- * Place after all other middleware
- *************************/
-app.use((err, req, res, next) => {
+/* ======================
+ * Central error handler
+ * (must have 4 args)
+ * ====================== */
+app.use(async (err, req, res, next) => {
   const status = err.status || 500;
 
-  // Log full details on the server (safe to keep detailed here)
+  // Log server-side details
   console.error(`Error at "${req.originalUrl}":\n`, err.stack || err.message);
 
-  // Generic message for non-404s (don't leak internals to the browser)
-  let message;
-  if (status === 404) {
-    message = err.message || 'File Not Found';
-  } else {
-    message = 'Oh no! There was a crash. Maybe try a different route?';
+  // Build nav so error pages still have site chrome
+  let nav = "";
+  try {
+    nav = await utilities.getNav(req, res, next);
+  } catch (navErr) {
+    console.error("Failed to build nav in error handler:", navErr);
   }
 
-  res.status(status).render('errors/error', {
+  // Friendly message (don’t leak internals)
+  const message =
+    status === 404
+      ? err.message || "File Not Found"
+      : "Oh no! There was a crash. Maybe try a different route?";
+
+  // In dev, pass error for optional stack trace in the view
+  const errForView = process.env.NODE_ENV === "production" ? undefined : err;
+
+  res.status(status).render("errors/error", {
     title: status,
-    message
+    message,
+    nav,
+    err: errForView,
   });
 });
 
-// -------------------- Start server --------------------
+/* ======================
+ * Start server
+ * ====================== */
 app.listen(PORT, () => {
   console.log(`CSE Motors running: http://localhost:${PORT}`);
 });

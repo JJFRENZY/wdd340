@@ -1,37 +1,37 @@
-const { Pool } = require("pg")
-require("dotenv").config()
-/* ***************
- * Connection Pool
- * SSL Object needed for local testing of app
- * But will cause problems in production environment
- * If - else will make determination which to use
- * *************** */
-let pool
-if (process.env.NODE_ENV == "development") {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false,
-    },
-})
+// database/index.js
+// Unified pg Pool export with consistent .query API
 
-// Added for troubleshooting queries
-// during development
-module.exports = {
-  async query(text, params) {
-    try {
-      const res = await pool.query(text, params)
-      console.log("executed query", { text })
-      return res
-    } catch (error) {
-      console.error("error in query", { text })
-      throw error
-    }
-  },
-}
-} else {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  })
-  module.exports = pool
-}
+const { Pool } = require("pg");
+try { require("dotenv").config(); } catch (_) {}
+
+const isProd = process.env.NODE_ENV === "production";
+const connectionString =
+  process.env.DATABASE_URL ||
+  undefined; // if undefined, pg will also read discrete PG* env vars
+
+// Use SSL when a DATABASE_URL is present in prod (e.g., Render)
+const ssl =
+  connectionString && (isProd || process.env.PGSSLMODE === "require")
+    ? { rejectUnauthorized: false }
+    : false;
+
+const pool = new Pool({
+  connectionString,
+  ssl,
+  // If you're using discrete PGHOST/PGUSER/PGPASSWORD/etc locally,
+  // pg will pick them up automatically when connectionString is undefined.
+});
+
+// Helpful: surface pool-level errors
+pool.on("error", (err) => {
+  console.error("Postgres Pool error:", err);
+});
+
+// Wrap .query for optional logging in non-production
+const rawQuery = pool.query.bind(pool);
+pool.query = async (text, params) => {
+  if (!isProd) console.log("SQL:", text);
+  return rawQuery(text, params);
+};
+
+module.exports = pool;

@@ -2,8 +2,12 @@
   <div class="wrap">
     <p>&copy; <span id="year"></span> CSE Motors. All rights reserved.</p>
     <address>
-      1234 Motor Way, Rexburg, ID 83440 · <a href="tel:+12085550123">(208) 555-0123</a>
+      1234 Motor Way, Rexburg, ID 83440 ·
+      <a href="tel:+12085550123" aria-label="Call CSE Motors">(208) 555-0123</a>
     </address>
+
+    <!-- Assignment 3: Task 3 — intentional 500 error trigger -->
+    <p><a href="/inv/boom" rel="nofollow">Trigger 500 Error (test)</a></p>
   </div>
 </footer>
 
@@ -14,5 +18,3 @@
     if (el) el.textContent = new Date().getFullYear();
   })();
 </script>
-</body>
-</html>
