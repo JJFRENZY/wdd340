@@ -1,37 +1,65 @@
 // database/index.js
-// Unified pg Pool export with consistent .query API
-
 const { Pool } = require("pg");
-try { require("dotenv").config(); } catch (_) {}
+try { require("dotenv").config({ override: true }); } catch (_) {}
 
 const isProd = process.env.NODE_ENV === "production";
-const connectionString =
-  process.env.DATABASE_URL ||
-  undefined; // if undefined, pg will also read discrete PG* env vars
 
-// Use SSL when a DATABASE_URL is present in prod (e.g., Render)
-const ssl =
-  connectionString && (isProd || process.env.PGSSLMODE === "require")
-    ? { rejectUnauthorized: false }
-    : false;
+function buildPoolConfig() {
+  const rawUrl = process.env.DATABASE_URL;
+  const url = rawUrl && rawUrl.trim(); // treat empty string as "not set"
 
-const pool = new Pool({
-  connectionString,
-  ssl,
-  // If you're using discrete PGHOST/PGUSER/PGPASSWORD/etc locally,
-  // pg will pick them up automatically when connectionString is undefined.
-});
+  // If a URL is present, use it (hosted DBs like Render/Heroku)
+  if (url) {
+    return {
+      connectionString: url,
+      ssl:
+        /^(require|true)$/i.test(process.env.PGSSLMODE || "") || isProd
+          ? { rejectUnauthorized: false }
+          : false,
+    };
+  }
 
-// Helpful: surface pool-level errors
-pool.on("error", (err) => {
-  console.error("Postgres Pool error:", err);
-});
+  // Otherwise require local/discrete PG* vars
+  const host = (process.env.PGHOST || "").trim();
+  const user = (process.env.PGUSER || "").trim();
+  const database = (process.env.PGDATABASE || "").trim();
 
-// Wrap .query for optional logging in non-production
-const rawQuery = pool.query.bind(pool);
-pool.query = async (text, params) => {
-  if (!isProd) console.log("SQL:", text);
-  return rawQuery(text, params);
-};
+  if (!host || !user || !database) {
+    // Give a clear error instead of "searchParams" blow-up
+    const msg = [
+      "No database configuration found.",
+      "Either set DATABASE_URL (hosted) or PGHOST/PGUSER/PGDATABASE (local).",
+      "Example hosted: DATABASE_URL=postgresql://USER:PASS@HOST:PORT/DB?sslmode=require",
+      "Example local: PGHOST=localhost PGUSER=postgres PGDATABASE=cse_motors"
+    ].join(" ");
+    throw new Error(msg);
+  }
+
+  return {
+    host,
+    port: Number(process.env.PGPORT || 5432),
+    user,
+    password: process.env.PGPASSWORD || "",
+    database,
+    ssl: /^(require|true)$/i.test(process.env.PGSSLMODE || "")
+      ? { rejectUnauthorized: false }
+      : false,
+  };
+}
+
+const config = buildPoolConfig();
+const pool = new Pool(config);
+
+// Dev visibility so you can see what it chose
+if (!isProd) {
+  console.log("[db] Using config:", {
+    viaUrl: !!(process.env.DATABASE_URL && process.env.DATABASE_URL.trim()),
+    host: config.host || "(via URL)",
+    database: config.database || "(via URL)",
+    ssl: !!config.ssl,
+  });
+}
+
+pool.on("error", (err) => console.error("Postgres Pool error:", err));
 
 module.exports = pool;
