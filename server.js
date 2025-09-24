@@ -5,80 +5,92 @@ const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const utilities = require("./utilities"); // for getNav() in error handler
+let db; // lazy-require for /healthz
 
-// Optionally load env vars in dev
+// Load env in dev
 try { require("dotenv").config(); } catch (_) {}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-/* ======================
- * View engine: EJS
- * ====================== */
+// Basic security / checklist
+app.disable("x-powered-by");
+
+// View engine: EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-// Allow absolute EJS includes like include('/partials/...ejs')
 app.locals.basedir = path.join(__dirname, "views");
 
-/* ======================
- * Static assets
- * ====================== */
+// Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ======================
- * Routes
- * ====================== */
+// (Optional) parsers if you add forms later
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// -------------------- Routes --------------------
+
+// Health check (optional but handy)
+app.get("/healthz", async (req, res) => {
+  try {
+    db = db || require("./database");
+    await db.query("select 1");
+    res.status(200).json({ ok: true });
+  } catch (e) {
+    res.status(503).json({ ok: false, error: e.code || e.message });
+  }
+});
 
 // Home
 app.get("/", asyncHandler(baseController.buildHome));
 
-// Inventory routes (classification, detail, 500 trigger)
+// Inventory routes
 app.use("/inv", inventoryRoute);
 
-// Optional: quick test route to throw a custom error
+// Optional: a test route that throws
 app.get(
   "/kaboom",
-  asyncHandler(async (_req, _res) => {
+  asyncHandler(async () => {
     const err = new Error("Test explosion 💥");
     err.status = 418; // I'm a teapot
     throw err;
   })
 );
 
-/* ======================
- * 404 handler
- * ====================== */
+// -------------------- 404 --------------------
 app.use((req, _res, next) => {
   const err = new Error("File Not Found");
   err.status = 404;
   next(err);
 });
 
-/* ======================
- * Central error handler
- * (must have 4 args)
- * ====================== */
+// -------------------- Central error handler --------------------
 app.use(async (err, req, res, next) => {
   const status = err.status || 500;
 
-  // Log server-side details
+  // Log on server
   console.error(`Error at "${req.originalUrl}":\n`, err.stack || err.message);
 
-  // Build nav so error pages still have site chrome
+  // If the error is clearly DB/DNS, don't try to build nav (avoids repeated DB calls)
+  const msg = (err && (err.message || "")) + "";
+  const isDbDown =
+    err.code === "ENOTFOUND" ||
+    /ENOTFOUND|ECONNREFUSED|ECONNRESET|terminated unexpectedly|no pg_hba/i.test(msg);
+
   let nav = "";
-  try {
-    nav = await utilities.getNav(req, res, next);
-  } catch (navErr) {
-    console.error("Failed to build nav in error handler:", navErr);
+  if (!isDbDown) {
+    try {
+      nav = await utilities.getNav(req, res, next);
+    } catch (navErr) {
+      console.error("Failed to build nav in error handler:", navErr);
+    }
   }
 
-  // Friendly message (don’t leak internals)
   const message =
     status === 404
       ? err.message || "File Not Found"
       : "Oh no! There was a crash. Maybe try a different route?";
 
-  // In dev, pass error for optional stack trace in the view
   const errForView = process.env.NODE_ENV === "production" ? undefined : err;
 
   res.status(status).render("errors/error", {
@@ -89,11 +101,7 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-/* ======================
- * Start server
- * ====================== */
+// -------------------- Start server --------------------
 app.listen(PORT, () => {
   console.log(`CSE Motors running: http://localhost:${PORT}`);
 });
-
-// update
