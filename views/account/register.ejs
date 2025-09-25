@@ -6,103 +6,91 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <%- messages() %>
-
-  <!-- Validation errors -->
-  <% if (Array.isArray(errors) && errors.length) { %>
-    <div class="notice" role="alert" aria-live="polite" style="margin:.75rem 0;">
-      <ul class="errors" style="margin:.25rem 0 .25rem 1rem;">
-        <% errors.forEach(e => { %>
-          <li><%= e.msg %></li>
-        <% }) %>
-      </ul>
-    </div>
-  <% } %>
+  <div id="messages"><%- messages() %></div>
 
   <form class="form" action="/account/register" method="post" novalidate>
+    <!-- First name -->
     <div class="form-row">
       <label for="account_firstname">First name</label>
       <input
         id="account_firstname"
         name="account_firstname"
         type="text"
-        autocomplete="given-name"
         required
-        placeholder="Tony"
-        value="<%= account_firstname || '' %>"
+        autocomplete="given-name"
+        inputmode="text"
       />
     </div>
 
+    <!-- Last name -->
     <div class="form-row">
       <label for="account_lastname">Last name</label>
       <input
         id="account_lastname"
         name="account_lastname"
         type="text"
-        autocomplete="family-name"
         required
-        placeholder="Stark"
-        value="<%= account_lastname || '' %>"
+        autocomplete="family-name"
+        inputmode="text"
       />
     </div>
 
+    <!-- Email -->
     <div class="form-row">
       <label for="account_email">Email</label>
       <input
         id="account_email"
         name="account_email"
         type="email"
-        inputmode="email"
-        autocomplete="email"
         required
         placeholder="you@example.com"
-        value="<%= account_email || '' %>"
+        autocomplete="email"
+        inputmode="email"
       />
     </div>
 
+    <!-- Password -->
     <div class="form-row">
       <label for="account_password">Password</label>
+      <div class="form-hint">
+        Passwords must be at least 12 characters and contain at least 1 number,
+        1 capital letter and 1 special character.
+      </div>
       <input
         id="account_password"
         name="account_password"
         type="password"
-        autocomplete="new-password"
-        minlength="12"
         required
-        placeholder="Create a strong password"
-        aria-describedby="pwd-hint"
+        minlength="12"
+        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+        title="12+ chars, 1 number, 1 uppercase, 1 special character"
+        autocomplete="new-password"
       />
-      <p class="form-hint" id="pwd-hint">
-        Must be at least <strong>12</strong> characters and include
-        <strong>1 uppercase</strong>, <strong>1 number</strong>, and
-        <strong>1 special</strong> character.
-      </p>
-
-      <button class="btn outline" type="button" id="togglePwd" aria-controls="account_password" aria-pressed="false">
-        Show password
-      </button>
+      <button type="button" class="btn outline" id="toggle-register-pass">Show password</button>
     </div>
 
-    <button class="btn primary" type="submit">Create account</button>
-  </form>
+    <div class="form-row">
+      <button class="btn primary" type="submit">Create account</button>
+    </div>
 
-  <p style="margin-top:.75rem">
-    Already have an account?
-    <a href="/account/login">Sign in</a>.
-  </p>
+    <p>
+      Already have an account?
+      <a href="/account/login">Log in</a>.
+    </p>
+  </form>
 </main>
 
 <script>
   (function () {
-    const btn = document.getElementById('togglePwd');
     const input = document.getElementById('account_password');
-    if (!btn || !input) return;
-    btn.addEventListener('click', () => {
-      const showing = input.type === 'text';
-      input.type = showing ? 'password' : 'text';
-      btn.textContent = showing ? 'Show password' : 'Hide password';
-      btn.setAttribute('aria-pressed', String(!showing));
-    });
+    const btn = document.getElementById('toggle-register-pass');
+    if (input && btn) {
+      btn.addEventListener('click', function () {
+        const isPwd = input.type === 'password';
+        input.type = isPwd ? 'text' : 'password';
+        btn.textContent = isPwd ? 'Hide password' : 'Show password';
+      });
+    }
   })();
 </script>
 

@@ -6,41 +6,67 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <%- messages() %>
+  <div id="messages"><%- messages() %></div>
 
+  <!-- Note: POST target is not implemented yet (only validating in browser) -->
   <form class="form" action="/account/login" method="post" novalidate>
+    <!-- Email -->
     <div class="form-row">
-      <label for="account_email">Email</label>
+      <label for="login_email">Email</label>
       <input
-        id="account_email"
+        id="login_email"
         name="account_email"
         type="email"
-        inputmode="email"
-        autocomplete="email"
         required
         placeholder="you@example.com"
+        autocomplete="email"
+        inputmode="email"
       />
+    </div>
+
+    <!-- Password -->
+    <div class="form-row">
+      <label for="login_password">Password</label>
+      <div class="form-hint">
+        Passwords must be at least 12 characters and contain at least 1 number,
+        1 capital letter and 1 special character.
+      </div>
+      <input
+        id="login_password"
+        name="account_password"
+        type="password"
+        required
+        minlength="12"
+        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+        title="12+ chars, 1 number, 1 uppercase, 1 special character"
+        autocomplete="current-password"
+      />
+      <button type="button" class="btn outline" id="toggle-login-pass">Show password</button>
     </div>
 
     <div class="form-row">
-      <label for="account_password">Password</label>
-      <input
-        id="account_password"
-        name="account_password"
-        type="password"
-        autocomplete="current-password"
-        required
-        placeholder="Your password"
-      />
+      <button class="btn primary" type="submit">Log in</button>
     </div>
 
-    <button class="btn primary" type="submit">Sign in</button>
+    <p>
+      Don’t have an account?
+      <a href="/account/register">Create one</a>.
+    </p>
   </form>
-
-  <p style="margin-top:.75rem">
-    Don’t have an account?
-    <a href="/account/register">Create one</a>.
-  </p>
 </main>
+
+<script>
+  (function () {
+    const input = document.getElementById('login_password');
+    const btn = document.getElementById('toggle-login-pass');
+    if (input && btn) {
+      btn.addEventListener('click', function () {
+        const isPwd = input.type === 'password';
+        input.type = isPwd ? 'text' : 'password';
+        btn.textContent = isPwd ? 'Hide password' : 'Show password';
+      });
+    }
+  })();
+</script>
 
 <%- include('../partials/footer.ejs') %>

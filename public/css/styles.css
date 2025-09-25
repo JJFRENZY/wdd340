@@ -78,6 +78,7 @@ a:focus { outline: 3px solid var(--outline); outline-offset: 3px; }
 .btn.primary { background: var(--brand); color: var(--brand-contrast); }
 .btn.outline { background: transparent; color: var(--brand); }
 .btn:focus-visible { outline: 3px solid var(--outline); outline-offset: 2px; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
 
 /* Hero */
 .hero { display: grid; gap: 1rem; }
@@ -165,8 +166,26 @@ main.error { padding: 2rem 1rem; }
 .form-row { display: grid; gap: .375rem; margin-bottom: .9rem; }
 .form-row label { font-weight: 600; }
 .form-row input {
-  padding: .6rem .7rem; border: 1px solid var(--border); border-radius: .5rem;
+  padding: .6rem .7rem; border: 1px solid var(--border); border-radius: .5rem; font-size: 1rem;
 }
+.form-row input:focus {
+  outline: 3px solid var(--outline);
+  outline-offset: 2px;
+}
+
+/* Client-side validity colors (native HTML5) */
+input:required:valid { border-color: #047857; /* green-700 */ }
+input:required:invalid,
+input:focus:invalid { border-color: #b91c1c; /* red-700 */ }
+
+.form-hint {
+  color: var(--muted);
+  font-size: .9rem;
+  margin: .15rem 0 .35rem;
+}
+
+/* Keep toggle password button tidy in rows */
+.form-row .btn[type="button"] { margin-top: .35rem; }
 
 /* ===== Responsive breakpoints ===== */
 @media (min-width: 48rem) {
