@@ -8,6 +8,17 @@
   <!-- Flash messages -->
   <%- messages() %>
 
+  <!-- Validation errors -->
+  <% if (Array.isArray(errors) && errors.length) { %>
+    <div class="notice" role="alert" aria-live="polite" style="margin:.75rem 0;">
+      <ul class="errors" style="margin:.25rem 0 .25rem 1rem;">
+        <% errors.forEach(e => { %>
+          <li><%= e.msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
   <form class="form" action="/account/register" method="post" novalidate>
     <div class="form-row">
       <label for="account_firstname">First name</label>
@@ -18,6 +29,7 @@
         autocomplete="given-name"
         required
         placeholder="Tony"
+        value="<%= account_firstname || '' %>"
       />
     </div>
 
@@ -30,6 +42,7 @@
         autocomplete="family-name"
         required
         placeholder="Stark"
+        value="<%= account_lastname || '' %>"
       />
     </div>
 
@@ -43,6 +56,7 @@
         autocomplete="email"
         required
         placeholder="you@example.com"
+        value="<%= account_email || '' %>"
       />
     </div>
 
