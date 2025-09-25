@@ -2,24 +2,21 @@
 const express = require("express");
 const router = new express.Router();
 
-const accountController = require("../controllers/accountController");
 const asyncHandler = require("../utilities/asyncHandler");
-const { registerRules } = require("../validators/accountValidators");
+const utilities = require("../utilities");
+const accountController = require("../controllers/accountController");
+const regValidate = require("../utilities/account-validation");
 
-// GET /account/login
+// Deliver login + register views
 router.get("/login", asyncHandler(accountController.buildLogin));
-
-// GET /account/register
 router.get("/register", asyncHandler(accountController.buildRegister));
 
-// POST /account/register  (validate -> controller)
+// Process the registration data (validate -> check -> controller)
 router.post(
   "/register",
-  registerRules,
+  regValidate.registationRules(), // (alias of .registrationRules)
+  regValidate.checkRegData,
   asyncHandler(accountController.registerAccount)
 );
-
-// (Temp) POST /account/login (keeps form working for now)
-router.post("/login", asyncHandler(accountController.loginStub));
 
 module.exports = router;
