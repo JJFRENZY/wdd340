@@ -8,7 +8,7 @@ function buildPoolConfig() {
   const rawUrl = process.env.DATABASE_URL;
   const url = rawUrl && rawUrl.trim(); // treat empty string as "not set"
 
-  // If a URL is present, use it (hosted DBs like Render/Heroku)
+  // Prefer a single hosted URL (Render/Heroku/etc.)
   if (url) {
     return {
       connectionString: url,
@@ -19,20 +19,17 @@ function buildPoolConfig() {
     };
   }
 
-  // Otherwise require local/discrete PG* vars
+  // Otherwise require discrete PG* vars
   const host = (process.env.PGHOST || "").trim();
   const user = (process.env.PGUSER || "").trim();
   const database = (process.env.PGDATABASE || "").trim();
 
   if (!host || !user || !database) {
-    // Give a clear error instead of "searchParams" blow-up
-    const msg = [
-      "No database configuration found.",
-      "Either set DATABASE_URL (hosted) or PGHOST/PGUSER/PGDATABASE (local).",
-      "Example hosted: DATABASE_URL=postgresql://USER:PASS@HOST:PORT/DB?sslmode=require",
+    throw new Error(
+      "No database configuration found. Either set DATABASE_URL (hosted) or PGHOST/PGUSER/PGDATABASE (local). " +
+      "Example hosted: DATABASE_URL=postgresql://USER:PASS@HOST:PORT/DB?sslmode=require " +
       "Example local: PGHOST=localhost PGUSER=postgres PGDATABASE=cse_motors"
-    ].join(" ");
-    throw new Error(msg);
+    );
   }
 
   return {
@@ -58,6 +55,17 @@ if (!isProd) {
     database: config.database || "(via URL)",
     ssl: !!config.ssl,
   });
+
+  // Optional: minimal error logging for queries in dev
+  const _query = pool.query.bind(pool);
+  pool.query = async (text, params) => {
+    try {
+      return await _query(text, params);
+    } catch (err) {
+      console.error("[db] query error:", (text || "").split("\n")[0]);
+      throw err;
+    }
+  };
 }
 
 pool.on("error", (err) => console.error("Postgres Pool error:", err));

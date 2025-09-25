@@ -1,8 +1,6 @@
 <%- include('partials/head.ejs', { title: title || 'CSE Motors' }) %>
 <%- include('partials/header.ejs') %>
-<%- include('partials/nav.ejs') %>
-
-<a class="skip-link" href="#main">Skip to content</a>
+<%- include('partials/nav.ejs', { nav }) %>
 
 <main id="main" class="home" tabindex="-1">
 
@@ -20,6 +18,10 @@
     </div>
     <div class="hero-copy">
       <h1 id="hero-heading">Your Next Ride Awaits</h1>
+
+      <!-- Flash messages (sessions) -->
+      <%- messages() %>
+
       <p>Explore our curated selection of cars, trucks, and SUVs. Transparent pricing. Friendly experts.</p>
       <a class="btn primary" href="#inventory" aria-describedby="inv-desc">Browse Inventory</a>
     </div>
@@ -109,7 +111,6 @@
       <a href="tel:+12085550123" aria-label="Call C S E Motors at (208) 555-0123">(208) 555-0123</a>
       or stop by our showroom today.
     </p>
-    <!-- Point this to a real route or map; avoid linking to the same section -->
     <a class="btn outline" href="/contact">Get Directions</a>
   </section>
 </main>

@@ -1,53 +1,96 @@
 // server.js (CommonJS)
 const path = require("path");
 const express = require("express");
+const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
+const pool = require("./database"); // <- pg.Pool from database/index.js
+const flash = require("connect-flash");
+const messages = require("express-messages");
+
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const utilities = require("./utilities"); // for getNav() in error handler
-let db; // lazy-require for /healthz
 
-// Load env in dev
-try { require("dotenv").config(); } catch (_) {}
+// Load env locally (no-op in prod)
+try { require("dotenv").config({ override: true }); } catch (_) {}
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
-// Basic security / checklist
+/* ======================
+ * Basic security / headers
+ * ====================== */
 app.disable("x-powered-by");
 
-// View engine: EJS
+/* ======================
+ * View engine: EJS
+ * ====================== */
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+// Allow absolute EJS includes like include('/partials/foo.ejs')
 app.locals.basedir = path.join(__dirname, "views");
 
-// Static files
+/* ======================
+ * Static + parsers
+ * ====================== */
 app.use(express.static(path.join(__dirname, "public")));
-
-// (Optional) parsers if you add forms later
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// -------------------- Routes --------------------
+/* ======================
+ * Sessions (stored in Postgres)
+ * ====================== */
+app.use(session({
+  store: new pgSession({
+    pool,                      // pg.Pool instance
+    tableName: "session",
+    createTableIfMissing: true,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,                // required for connect-flash
+  saveUninitialized: true,
+  name: "sessionId",
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 1000 * 60 * 60 * 2, // 2 hours
+  },
+}));
 
-// Health check (optional but handy)
-app.get("/healthz", async (req, res) => {
+/* ======================
+ * Flash messages
+ * ====================== */
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.messages = messages(req, res); // exposes messages() to views
+  next();
+});
+
+/* ======================
+ * Health check (optional)
+ * ====================== */
+app.get("/healthz", async (_req, res) => {
   try {
-    db = db || require("./database");
-    await db.query("select 1");
+    await pool.query("select 1");
     res.status(200).json({ ok: true });
   } catch (e) {
     res.status(503).json({ ok: false, error: e.code || e.message });
   }
 });
 
+/* ======================
+ * Routes
+ * ====================== */
+
 // Home
 app.get("/", asyncHandler(baseController.buildHome));
 
-// Inventory routes
+// Inventory (classification, detail, intentional 500)
 app.use("/inv", inventoryRoute);
 
-// Optional: a test route that throws
+// Optional: quick test route that throws a custom error
 app.get(
   "/kaboom",
   asyncHandler(async () => {
@@ -57,21 +100,25 @@ app.get(
   })
 );
 
-// -------------------- 404 --------------------
+/* ======================
+ * 404 handler
+ * ====================== */
 app.use((req, _res, next) => {
   const err = new Error("File Not Found");
   err.status = 404;
   next(err);
 });
 
-// -------------------- Central error handler --------------------
+/* ======================
+ * Central error handler
+ * ====================== */
 app.use(async (err, req, res, next) => {
   const status = err.status || 500;
 
-  // Log on server
+  // Log details on server
   console.error(`Error at "${req.originalUrl}":\n`, err.stack || err.message);
 
-  // If the error is clearly DB/DNS, don't try to build nav (avoids repeated DB calls)
+  // Avoid re-querying DB for nav if the error is clearly DB/DNS
   const msg = (err && (err.message || "")) + "";
   const isDbDown =
     err.code === "ENOTFOUND" ||
@@ -91,6 +138,7 @@ app.use(async (err, req, res, next) => {
       ? err.message || "File Not Found"
       : "Oh no! There was a crash. Maybe try a different route?";
 
+  // Only show stack in non-production
   const errForView = process.env.NODE_ENV === "production" ? undefined : err;
 
   res.status(status).render("errors/error", {
@@ -101,7 +149,9 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-// -------------------- Start server --------------------
+/* ======================
+ * Start server
+ * ====================== */
 app.listen(PORT, () => {
   console.log(`CSE Motors running: http://localhost:${PORT}`);
 });
