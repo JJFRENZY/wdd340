@@ -3,14 +3,14 @@ const path = require("path");
 const express = require("express");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
-const pool = require("./database"); // <- pg.Pool from database/index.js
+const pool = require("./database"); // pg.Pool from database/index.js
 const flash = require("connect-flash");
 const messages = require("express-messages");
 
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
-const accountRoute = require("./routes/accountRoute"); // <-- NEW
+const accountRoute = require("./routes/accountRoute"); // <-- accounts router
 const utilities = require("./utilities"); // for getNav() in error handler
 
 // Load env locally (no-op in prod)
@@ -88,8 +88,8 @@ app.get("/healthz", async (_req, res) => {
 // Home
 app.get("/", asyncHandler(baseController.buildHome));
 
-// Account (login view)
-app.use("/account", accountRoute); // <-- NEW
+// Accounts (login, register, etc.)
+app.use("/account", accountRoute);
 
 // Inventory (classification, detail, intentional 500)
 app.use("/inv", inventoryRoute);

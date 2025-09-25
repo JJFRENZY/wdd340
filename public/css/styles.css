@@ -56,10 +56,6 @@ a:focus { outline: 3px solid var(--outline); outline-offset: 3px; }
 .tagline { margin: .25rem 0 0; color: var(--muted); font-size: .95rem; }
 .logo { width: 40px; height: 40px; }
 
-/* NEW: header right side (tagline + account button) */
-.header-right { display: flex; gap: .75rem; align-items: center; }
-.account-link { white-space: nowrap; }
-
 /* Nav */
 .site-nav { background: #ffffff; border-bottom: 1px solid var(--border); }
 .site-nav ul {
@@ -156,32 +152,21 @@ a:focus { outline: 3px solid var(--outline); outline-offset: 3px; }
 main.error { padding: 2rem 1rem; }
 .error-msg { color: #b91c1c; font-weight: 600; }
 
-/* ===== NEW: Account / Auth (login) ===== */
-.auth {
-  max-width: 28rem;
-  margin: 1rem auto 2rem;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: .75rem;
-  padding: 1rem;
-}
-.form-grid { display: grid; gap: .9rem; }
-.field label { display: block; font-weight: 600; margin-bottom: .25rem; }
-.field input[type="email"],
-.field input[type="password"] {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: .5rem;
-  padding: .6rem .7rem;
-}
-.actions { display: flex; gap: .5rem; align-items: center; }
-.alt { margin-top: .25rem; color: var(--muted); }
+/* ===== Flash messages (express-messages output) ===== */
+#messages { margin: .75rem 0; }
+#messages ul.messages { list-style: none; padding: 0; margin: 0; }
+#messages ul.messages li { margin: .25rem 0; padding: .6rem .75rem; border-radius: .5rem; }
+#messages ul.messages li.notice { background: #fffbeb; border: 1px solid #fed7aa; color: #92400e; }
+#messages ul.messages li.error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+#messages ul.messages li.success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
 
-/* Optional: express-messages default list */
-.messages { list-style: none; padding-left: 0; margin: .75rem 0 1rem; }
-.messages li { margin: .25rem 0; }
-.messages li.notice { background: #ecfeff; border: 1px solid #a5f3fc; color: #155e75; padding: .5rem .6rem; border-radius: .5rem; }
-.messages li.error  { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: .5rem .6rem; border-radius: .5rem; }
+/* ===== Forms (login/register) ===== */
+.form { max-width: 28rem; }
+.form-row { display: grid; gap: .375rem; margin-bottom: .9rem; }
+.form-row label { font-weight: 600; }
+.form-row input {
+  padding: .6rem .7rem; border: 1px solid var(--border); border-radius: .5rem;
+}
 
 /* ===== Responsive breakpoints ===== */
 @media (min-width: 48rem) {
