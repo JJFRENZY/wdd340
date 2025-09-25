@@ -2,21 +2,38 @@
 const express = require("express");
 const router = new express.Router();
 
-const asyncHandler = require("../utilities/asyncHandler");
 const utilities = require("../utilities");
 const accountController = require("../controllers/accountController");
 const regValidate = require("../utilities/account-validation");
 
-// Deliver login + register views
-router.get("/login", asyncHandler(accountController.buildLogin));
-router.get("/register", asyncHandler(accountController.buildRegister));
+// Login view
+router.get(
+  "/login",
+  utilities.handleErrors(accountController.buildLogin)
+);
 
-// Process the registration data (validate -> check -> controller)
+// Registration view
+router.get(
+  "/register",
+  utilities.handleErrors(accountController.buildRegister)
+);
+
+// Process registration
 router.post(
   "/register",
-  regValidate.registationRules(), // (alias of .registrationRules)
+  regValidate.registationRules(),
   regValidate.checkRegData,
-  asyncHandler(accountController.registerAccount)
+  utilities.handleErrors(accountController.registerAccount)
+);
+
+// TEMP: Process login (validation only; real auth comes later)
+router.post(
+  "/login",
+  regValidate.loginRules(),
+  regValidate.checkLoginData,
+  (req, res) => {
+    res.status(200).send("login process");
+  }
 );
 
 module.exports = router;

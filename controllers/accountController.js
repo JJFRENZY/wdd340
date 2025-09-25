@@ -9,11 +9,12 @@ const accountController = {};
  * *************************************** */
 accountController.buildLogin = async function (req, res, next) {
   try {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = await utilities.getNav();
     res.render("account/login", {
       title: "Login",
       nav,
-      errors: null, // important for views that may expect it
+      errors: null, // so view can safely reference errors
+      account_email: "", // sticky default
     });
   } catch (err) {
     next(err);
@@ -25,12 +26,11 @@ accountController.buildLogin = async function (req, res, next) {
  * *************************************** */
 accountController.buildRegister = async function (req, res, next) {
   try {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = await utilities.getNav();
     res.render("account/register", {
       title: "Register",
       nav,
-      errors: null, // important (prevents EJS error before any validation)
-      // optional: default sticky values
+      errors: null, // important for first load
       account_firstname: "",
       account_lastname: "",
       account_email: "",
@@ -45,7 +45,7 @@ accountController.buildRegister = async function (req, res, next) {
  * *************************************** */
 accountController.registerAccount = async function (req, res, next) {
   try {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = await utilities.getNav();
     const {
       account_firstname,
       account_lastname,
@@ -60,19 +60,19 @@ accountController.registerAccount = async function (req, res, next) {
       account_password
     );
 
-    if (regResult && regResult.rows && regResult.rows.length) {
+    if (regResult && regResult.rowCount === 1) {
       req.flash(
-        "success",
-        `Congratulations, you're registered, ${account_firstname}. Please log in.`
+        "notice",
+        `Congratulations, you're registered ${account_firstname}. Please log in.`
       );
       return res.status(201).render("account/login", {
         title: "Login",
         nav,
         errors: null,
+        account_email, // prefill email
       });
     }
 
-    // If we reach here, the DB insert didn't return rows
     req.flash("error", "Sorry, the registration failed.");
     return res.status(501).render("account/register", {
       title: "Register",
@@ -83,28 +83,8 @@ accountController.registerAccount = async function (req, res, next) {
       account_email,
     });
   } catch (err) {
-    // DB/other error
-    req.flash("error", "Registration failed due to a server error.");
-    try {
-      const nav = await utilities.getNav(req, res, next);
-      return res.status(500).render("account/register", {
-        title: "Register",
-        nav,
-        errors: null,
-        account_firstname: req.body.account_firstname,
-        account_lastname: req.body.account_lastname,
-        account_email: req.body.account_email,
-      });
-    } catch (_) {
-      return next(err);
-    }
+    next(err);
   }
 };
 
-// controllers/accountController.js
-module.exports = {
-  buildLogin,
-  buildRegister,
-  registerAccount,
-};
-
+module.exports = accountController;
