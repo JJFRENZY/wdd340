@@ -1,0 +1,53 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="account container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <!-- Flash messages -->
+  <%- messages() %>
+
+  <section class="auth" aria-labelledby="login-heading">
+    <h2 id="login-heading" class="sr-only">Log in to your account</h2>
+
+    <form class="form-grid" action="/account/login" method="post" novalidate>
+      <div class="field">
+        <label for="account_email">Email</label>
+        <input
+          id="account_email"
+          name="account_email"
+          type="email"
+          inputmode="email"
+          autocomplete="username"
+          required
+          placeholder="you@example.com"
+        />
+      </div>
+
+      <div class="field">
+        <label for="account_password">Password</label>
+        <input
+          id="account_password"
+          name="account_password"
+          type="password"
+          autocomplete="current-password"
+          required
+          placeholder="Your password"
+        />
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="submit">Log In</button>
+        <a class="btn outline" href="/">Cancel</a>
+      </div>
+
+      <p class="alt">
+        Don’t have an account?
+        <a href="/account/register">Create one</a>
+      </p>
+    </form>
+  </section>
+</main>
+
+<%- include('../partials/footer.ejs') %>

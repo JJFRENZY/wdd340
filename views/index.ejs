@@ -2,6 +2,8 @@
 <%- include('partials/header.ejs') %>
 <%- include('partials/nav.ejs', { nav }) %>
 
+<a class="skip-link" href="#main">Skip to content</a>
+
 <main id="main" class="home" tabindex="-1">
 
   <!-- Hero Section -->
@@ -19,7 +21,7 @@
     <div class="hero-copy">
       <h1 id="hero-heading">Your Next Ride Awaits</h1>
 
-      <!-- Flash messages (sessions) -->
+      <!-- Flash messages (from session) -->
       <%- messages() %>
 
       <p>Explore our curated selection of cars, trucks, and SUVs. Transparent pricing. Friendly experts.</p>

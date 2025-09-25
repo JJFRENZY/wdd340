@@ -10,6 +10,7 @@ const messages = require("express-messages");
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
+const accountRoute = require("./routes/accountRoute"); // <-- NEW
 const utilities = require("./utilities"); // for getNav() in error handler
 
 // Load env locally (no-op in prod)
@@ -86,6 +87,9 @@ app.get("/healthz", async (_req, res) => {
 
 // Home
 app.get("/", asyncHandler(baseController.buildHome));
+
+// Account (login view)
+app.use("/account", accountRoute); // <-- NEW
 
 // Inventory (classification, detail, intentional 500)
 app.use("/inv", inventoryRoute);
