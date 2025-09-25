@@ -101,4 +101,10 @@ accountController.registerAccount = async function (req, res, next) {
   }
 };
 
-module.exports = accountController;
+// controllers/accountController.js
+module.exports = {
+  buildLogin,
+  buildRegister,
+  registerAccount,
+};
+
