@@ -11,7 +11,10 @@ router.get("/login", asyncHandler(accountController.buildLogin));
 // GET /account/register
 router.get("/register", asyncHandler(accountController.buildRegister));
 
-// TEMP: POST /account/login (stub to demonstrate flash + redirect)
+// POST /account/register  (process registration)
+router.post("/register", asyncHandler(accountController.registerAccount));
+
+// (Temp) POST /account/login (keeps form working for now)
 router.post("/login", asyncHandler(accountController.loginStub));
 
 module.exports = router;
