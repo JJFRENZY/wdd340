@@ -8,10 +8,32 @@
   <!-- Flash messages -->
   <div id="messages"><%- messages() %></div>
 
-  <p>Manage classifications and inventory:</p>
-  <ul>
-    <li><a class="btn" href="/inv/add-classification">Add New Classification</a></li>
-    <li><a class="btn outline" href="/inv/add-inventory">Add New Inventory</a></li>
+  <!-- (Optional) server-side validation errors -->
+  <% if (errors) { %>
+    <ul class="notice" aria-live="polite">
+      <% if (typeof errors.array === 'function') { errors.array().forEach(err => { %>
+        <li><%= err.msg %></li>
+      <% }) } %>
+    </ul>
+  <% } %>
+
+  <p>Manage classifications and vehicles.</p>
+
+  <ul class="card-grid" role="list" style="margin-top:1rem">
+    <li class="card">
+      <div class="card-body">
+        <h3>Add a New Classification</h3>
+        <p>Create a classification (letters only, no spaces or symbols).</p>
+        <a class="btn primary" href="/inv/add-classification">Start</a>
+      </div>
+    </li>
+    <li class="card">
+      <div class="card-body">
+        <h3>Add a New Vehicle</h3>
+        <p>Add a vehicle and assign it to a classification.</p>
+        <a class="btn primary" href="/inv/add-inventory">Start</a>
+      </div>
+    </li>
   </ul>
 </main>
 
