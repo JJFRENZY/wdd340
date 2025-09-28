@@ -33,7 +33,7 @@ async function getInventoryByClassificationId(classification_id) {
   }
 }
 
-/* NEW: Get a single vehicle by inv_id (parameterized) */
+/* Get a single vehicle by inv_id (parameterized) */
 async function getInventoryById(invId) {
   try {
     const sql = `
@@ -51,8 +51,68 @@ async function getInventoryById(invId) {
   }
 }
 
+/* NEW: Insert a classification */
+async function addClassification(classification_name) {
+  try {
+    const sql = `
+      INSERT INTO public.classification (classification_name)
+      VALUES ($1)
+      RETURNING *
+    `;
+    const { rows } = await pool.query(sql, [classification_name]);
+    return rows[0];
+  } catch (error) {
+    console.error("addClassification error:", error);
+    throw error;
+  }
+}
+
+/* NEW: Insert an inventory item */
+async function addInventory({
+  inv_make,
+  inv_model,
+  inv_year,
+  inv_description,
+  inv_image,
+  inv_thumbnail,
+  inv_price,
+  inv_miles,
+  inv_color,
+  classification_id,
+}) {
+  try {
+    const sql = `
+      INSERT INTO public.inventory
+      (inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail,
+       inv_price, inv_miles, inv_color, classification_id)
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      RETURNING *
+    `;
+    const params = [
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+    ];
+    const { rows } = await pool.query(sql, params);
+    return rows[0];
+  } catch (error) {
+    console.error("addInventory error:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   getClassifications,
   getInventoryByClassificationId,
-  getInventoryById, // <- export the new function
+  getInventoryById,
+  addClassification,
+  addInventory,
 };

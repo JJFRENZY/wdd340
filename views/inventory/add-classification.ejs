@@ -1,0 +1,40 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <div id="messages"><%- messages() %></div>
+
+  <% if (errors) { %>
+    <ul class="notice">
+      <% errors.array().forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <p>Classification names must contain <strong>letters only</strong> — no spaces or special characters.</p>
+
+  <form action="/inv/add-classification" method="post" class="form" novalidate>
+    <div class="form-row">
+      <label for="classification_name">Classification Name</label>
+      <input
+        type="text"
+        id="classification_name"
+        name="classification_name"
+        value="<%= locals.classification_name || '' %>"
+        required
+        pattern="[A-Za-z]+"
+        aria-describedby="c-help"
+      />
+      <small id="c-help" class="muted">Only letters A–Z. No spaces or special characters.</small>
+    </div>
+
+    <button class="btn primary" type="submit">Add Classification</button>
+    <a class="btn outline" href="/inv">Cancel</a>
+  </form>
+</main>
+
+<%- include('../partials/footer.ejs') %>

@@ -142,4 +142,37 @@ Util.buildVehicleDetailHtml = function (v) {
   `
 }
 
+/* **************************************
+ * Build classification <select> element for forms
+ *  - Makes previously chosen item sticky when classification_id is provided
+ * ************************************ */
+Util.buildClassificationList = async function (classification_id = null) {
+  try {
+    const data = await invModel.getClassifications()
+    let classificationList =
+      '<select name="classification_id" id="classificationList" required>'
+    classificationList += "<option value=''>Choose a Classification</option>"
+    data.rows.forEach((row) => {
+      classificationList += '<option value="' + row.classification_id + '"'
+      if (
+        classification_id != null &&
+        Number(row.classification_id) === Number(classification_id)
+      ) {
+        classificationList += " selected"
+      }
+      classificationList += ">" + row.classification_name + "</option>"
+    })
+    classificationList += "</select>"
+    return classificationList
+  } catch (e) {
+    console.error("buildClassificationList error:", e)
+    // Safe fallback so the view still renders
+    return `
+      <select name="classification_id" id="classificationList" required>
+        <option value=''>Choose a Classification</option>
+      </select>
+    `
+  }
+}
+
 module.exports = Util

@@ -1,24 +1,39 @@
 // routes/inventoryRoute.js
-
 const express = require("express");
 const router = new express.Router();
 
 const invController = require("../controllers/invController");
 const asyncHandler = require("../utilities/asyncHandler");
+const invValidate = require("../utilities/inv-validation");
 
-// Classification listing (existing)
-router.get("/type/:classificationId",
-  asyncHandler(invController.buildByClassificationId)
+// Management landing
+router.get("/", asyncHandler(invController.buildManagement));
+
+// Classification listing
+router.get("/type/:classificationId", asyncHandler(invController.buildByClassificationId));
+
+// Single-vehicle detail page
+router.get("/detail/:inv_id", asyncHandler(invController.buildDetail));
+
+// Intentional 500 error trigger
+router.get("/boom", asyncHandler(invController.triggerBoom));
+
+// ----- Add Classification -----
+router.get("/add-classification", asyncHandler(invController.buildAddClassification));
+router.post(
+  "/add-classification",
+  invValidate.classificationRules(),
+  invValidate.checkClassificationData,
+  asyncHandler(invController.addClassification)
 );
 
-// NEW: Single-vehicle detail page (Task 1)
-router.get("/detail/:inv_id",
-  asyncHandler(invController.buildDetail)
-);
-
-// NEW: Intentional 500 error trigger (Task 3)
-router.get("/boom",
-  asyncHandler(invController.triggerBoom) // throws; caught by error middleware
+// ----- Add Inventory -----
+router.get("/add-inventory", asyncHandler(invController.buildAddInventory));
+router.post(
+  "/add-inventory",
+  invValidate.inventoryRules(),
+  invValidate.checkInventoryData,
+  asyncHandler(invController.addInventory)
 );
 
 module.exports = router;
