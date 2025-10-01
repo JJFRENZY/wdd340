@@ -6,6 +6,12 @@ const utilities = require("../utilities");
 const accountController = require("../controllers/accountController");
 const regValidate = require("../utilities/account-validation");
 
+// Account management (default landing after login)
+router.get(
+  "/",
+  utilities.handleErrors(accountController.buildAccountManagement)
+);
+
 // Login view
 router.get(
   "/login",
@@ -26,14 +32,18 @@ router.post(
   utilities.handleErrors(accountController.registerAccount)
 );
 
-// TEMP: Process login (validation only; real auth comes later)
+// Process login (with server-side validation + controller)
 router.post(
   "/login",
   regValidate.loginRules(),
   regValidate.checkLoginData,
-  (req, res) => {
-    res.status(200).send("login process");
-  }
+  utilities.handleErrors(accountController.accountLogin)
+);
+
+// Logout (clears JWT cookie)
+router.get(
+  "/logout",
+  utilities.handleErrors(accountController.logout)
 );
 
 module.exports = router;

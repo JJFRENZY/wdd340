@@ -6,6 +6,8 @@ const pgSession = require("connect-pg-simple")(session);
 const pool = require("./database"); // pg.Pool from database/index.js
 const flash = require("connect-flash");
 const messages = require("express-messages");
+const cookieParser = require("cookie-parser");            // <-- NEW
+const { attachJWT } = require("./utilities/auth");        // <-- NEW
 
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
@@ -38,6 +40,7 @@ app.locals.basedir = path.join(__dirname, "views");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());                                  // <-- NEW
 
 /* ======================
  * Sessions (stored in Postgres)
@@ -68,6 +71,11 @@ app.use((req, res, next) => {
   res.locals.messages = messages(req, res); // exposes messages() to views
   next();
 });
+
+/* ======================
+ * JWT attach (non-blocking)
+ * ====================== */
+app.use(attachJWT);                                      // <-- NEW
 
 /* ======================
  * Health check (optional)

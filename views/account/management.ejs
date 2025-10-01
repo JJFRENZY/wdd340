@@ -1,0 +1,23 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <div id="messages"><%- messages() %></div>
+
+  <p>
+    You're logged in
+    <% if (typeof accountData !== 'undefined' && accountData && accountData.account_firstname) { %>
+      , <strong><%= accountData.account_firstname %></strong>
+    <% } %>.
+  </p>
+
+  <ul>
+    <li><a class="btn" href="/inv">Inventory Management</a></li>
+    <li><a class="btn outline" href="/account/logout">Logout</a></li>
+  </ul>
+</main>
+
+<%- include('../partials/footer.ejs') %>
