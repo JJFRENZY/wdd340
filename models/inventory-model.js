@@ -67,6 +67,7 @@ async function getInventoryById(invId) {
         JOIN public.classification c
           ON i.classification_id = c.classification_id
        WHERE i.inv_id = $1
+       LIMIT 1
     `;
     const { rows } = await pool.query(sql, [invId]);
     return rows[0]; // undefined if not found
@@ -74,6 +75,11 @@ async function getInventoryById(invId) {
     console.error("getInventoryById error:", error);
     throw error;
   }
+}
+
+/** Alias so controllers can call getVehicleById() */
+async function getVehicleById(invId) {
+  return getInventoryById(invId);
 }
 
 /** Insert a new vehicle and return the inserted row */
@@ -125,6 +131,7 @@ module.exports = {
   getClassifications,
   getInventoryByClassificationId,
   getInventoryById,
+  getVehicleById, // ✅ alias export
   // writes
   addClassification,
   addInventory,
