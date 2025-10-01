@@ -175,4 +175,17 @@ Util.buildClassificationList = async function (classification_id = null) {
   }
 }
 
+/* ****************************************
+ *  Check Login (general authorization gate)
+ *  - Expects a prior JWT middleware to set res.locals.loggedin
+ * ************************************ */
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    return next()
+  } else {
+    req.flash("notice", "Please log in.")
+    return res.redirect("/account/login")
+  }
+}
+
 module.exports = Util

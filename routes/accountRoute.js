@@ -7,8 +7,10 @@ const accountController = require("../controllers/accountController");
 const regValidate = require("../utilities/account-validation");
 
 // Account management (default landing after login)
+// ✅ Updated: added utilities.checkLogin middleware
 router.get(
   "/",
+  utilities.checkLogin,
   utilities.handleErrors(accountController.buildAccountManagement)
 );
 
