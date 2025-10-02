@@ -1,35 +1,5 @@
-// utilities/auth.js
+// utilities/auth.js  (UPDATED: helpers only, no attachJWT)
 const jwt = require("jsonwebtoken")
-
-/**
- * attachJWT
- * Reads the JWT from the "jwt" cookie, verifies it, and exposes:
- *   - res.locals.loggedin (boolean)
- *   - res.locals.accountData (decoded payload or null)
- *
- * Safe and non-blocking: requests continue even when token is missing/invalid.
- * Requires cookie-parser to be mounted earlier in the chain.
- */
-function attachJWT(req, res, next) {
-  const token = req.cookies?.jwt
-  if (!token) {
-    res.locals.loggedin = false
-    res.locals.accountData = null
-    return next()
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-    res.locals.loggedin = true
-    res.locals.accountData = decoded
-    return next()
-  } catch (_err) {
-    // Invalid or expired token: treat as logged out
-    res.locals.loggedin = false
-    res.locals.accountData = null
-    return next()
-  }
-}
 
 /**
  * issueJwt
@@ -42,6 +12,10 @@ function issueJwt(payload, opts = {}) {
     cookieMaxAgeMs = 60 * 60 * 1000, // 1 hour
     cookiePath = "/",
   } = opts
+
+  if (!process.env.ACCESS_TOKEN_SECRET) {
+    throw new Error("ACCESS_TOKEN_SECRET is not set")
+  }
 
   const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn })
 
@@ -66,7 +40,7 @@ function clearJwt(res, path = "/") {
 
 /**
  * (Optional) requireRole
- * Gate specific routes by role(s). Assumes attachJWT has already run.
+ * Gate specific routes by role(s). Assumes jwtAuth has already run.
  * Example: router.get("/admin", requireRole("Admin"), handler)
  */
 function requireRole(...allowed) {
@@ -79,7 +53,6 @@ function requireRole(...allowed) {
 }
 
 module.exports = {
-  attachJWT,
   issueJwt,
   clearJwt,
   requireRole, // optional

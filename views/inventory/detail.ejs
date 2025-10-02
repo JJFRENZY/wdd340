@@ -1,29 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title><%= title %> | CSE Motors</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/css/styles.css" />
-</head>
-<body>
-  <!-- Header / site chrome -->
-  <%- include('/partials/header') %>
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
 
-  <!-- Main navigation built from DB -->
-  <nav aria-label="Main Navigation" class="site-nav">
-    <%- nav %>
-  </nav>
+<main id="main" class="container" tabindex="-1">
+  <h1 id="veh-h1"><%= title %></h1>
 
-  <!-- Main content -->
-  <main id="main" tabindex="-1" class="container">
-    <h1 id="veh-h1"><%= title %></h1>
+  <!-- Flash messages (optional) -->
+  <div id="messages"><%- messages() %></div>
 
-    <!-- Vehicle detail block (built in utilities.buildVehicleDetailHtml) -->
+  <!-- Vehicle detail block (built in utilities.buildVehicleDetailHtml) -->
+  <div class="vehicle-detail-wrap">
     <%- vehicleDetail %>
-  </main>
+  </div>
+</main>
 
-  <!-- Footer (contains the 500-error test link) -->
-  <%- include('/partials/footer') %>
-</body>
-</html>
+<%- include('../partials/footer.ejs') %>

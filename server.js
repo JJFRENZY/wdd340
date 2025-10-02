@@ -1,4 +1,4 @@
-// server.js (CommonJS)
+// server.js (CommonJS) — UPDATED
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
@@ -6,17 +6,25 @@ const pgSession = require("connect-pg-simple")(session);
 const pool = require("./database"); // pg.Pool from database/index.js
 const flash = require("connect-flash");
 const messages = require("express-messages");
-const cookieParser = require("cookie-parser");            // <-- NEW
-const { attachJWT } = require("./utilities/auth");        // <-- NEW
+const cookieParser = require("cookie-parser");
+const jwtAuth = require("./middleware/jwtAuth"); // <-- use our JWT sanity middleware
 
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
-const accountRoute = require("./routes/accountRoute"); // <-- accounts router
+const accountRoute = require("./routes/accountRoute");
 const utilities = require("./utilities"); // for getNav() in error handler
 
 // Load env locally (no-op in prod)
 try { require("dotenv").config({ override: true }); } catch (_) {}
+
+// ===== Startup sanity checks for env secrets =====
+if (!process.env.ACCESS_TOKEN_SECRET) {
+  throw new Error("Missing ACCESS_TOKEN_SECRET env var");
+}
+if (!process.env.SESSION_SECRET) {
+  throw new Error("Missing SESSION_SECRET env var");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,14 +48,14 @@ app.locals.basedir = path.join(__dirname, "views");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(cookieParser());                                  // <-- NEW
+app.use(cookieParser()); // <- must be before jwtAuth
 
 /* ======================
  * Sessions (stored in Postgres)
  * ====================== */
 app.use(session({
   store: new pgSession({
-    pool,                      // pg.Pool instance
+    pool,
     tableName: "session",
     createTableIfMissing: true,
   }),
@@ -73,9 +81,10 @@ app.use((req, res, next) => {
 });
 
 /* ======================
- * JWT attach (non-blocking)
+ * Request-level auth sanity check
+ *  - Always sets res.locals.loggedin (boolean) and res.locals.accountData (object|null)
  * ====================== */
-app.use(attachJWT);                                      // <-- NEW
+app.use(jwtAuth);
 
 /* ======================
  * Health check (optional)

@@ -1,4 +1,4 @@
-// middleware/jwtAuth.js
+// middleware/jwtAuth.js — NEW
 const jwt = require("jsonwebtoken")
 
 /**
@@ -12,22 +12,19 @@ const jwt = require("jsonwebtoken")
  * - ACCESS_TOKEN_SECRET must be set in your environment.
  */
 module.exports = function jwtAuth(req, res, next) {
+  res.locals.loggedin = false
+  res.locals.accountData = null
+
   const token = req.cookies?.jwt
-  if (!token) {
-    res.locals.loggedin = false
-    res.locals.accountData = null
-    return next()
-  }
+  if (!token) return next()
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     res.locals.loggedin = true
     res.locals.accountData = decoded
     return next()
-  } catch (err) {
+  } catch (_err) {
     // Token invalid or expired: treat as logged out
-    res.locals.loggedin = false
-    res.locals.accountData = null
     return next()
   }
 }
