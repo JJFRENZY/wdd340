@@ -5,7 +5,17 @@
 <main id="main" class="container" tabindex="-1">
   <h1><%= title %></h1>
 
+  <!-- Flash messages -->
   <div id="messages"><%- messages() %></div>
+
+  <!-- (Optional) server-side validation errors -->
+  <% if (errors) { %>
+    <ul class="notice" aria-live="polite">
+      <% if (typeof errors.array === 'function') { errors.array().forEach(err => { %>
+        <li><%= err.msg %></li>
+      <% }) } %>
+    </ul>
+  <% } %>
 
   <p>
     You're logged in
@@ -14,9 +24,21 @@
     <% } %>.
   </p>
 
-  <ul>
-    <li><a class="btn" href="/inv">Inventory Management</a></li>
-    <li><a class="btn outline" href="/account/logout">Logout</a></li>
+  <ul class="card-grid" role="list" style="margin-top:1rem">
+    <li class="card">
+      <div class="card-body">
+        <h3>Inventory Management</h3>
+        <p>Manage classifications and vehicles.</p>
+        <a class="btn primary" href="/inv">Open</a>
+      </div>
+    </li>
+    <li class="card">
+      <div class="card-body">
+        <h3>Logout</h3>
+        <p>Sign out of your account.</p>
+        <a class="btn outline" href="/account/logout">Logout</a>
+      </div>
+    </li>
   </ul>
 </main>
 
