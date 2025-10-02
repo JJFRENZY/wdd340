@@ -5,10 +5,12 @@
 <main id="main" class="container" tabindex="-1">
   <h1><%= title %></h1>
 
-  <div id="messages"><%- messages() %></div>
+  <!-- Flash/messages -->
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
-  <% if (errors) { %>
-    <ul class="notice">
+  <!-- Server-side validation errors -->
+  <% if (errors && typeof errors.array === 'function' && errors.array().length) { %>
+    <ul class="notice" aria-live="polite">
       <% errors.array().forEach(error => { %>
         <li><%= error.msg %></li>
       <% }) %>
@@ -17,17 +19,20 @@
 
   <p>Classification names must contain <strong>letters only</strong> — no spaces or special characters.</p>
 
-  <form action="/inv/add-classification" method="post" class="form" novalidate>
+  <!-- No 'novalidate' so native HTML validation runs -->
+  <form action="/inv/add-classification" method="post" class="form">
     <div class="form-row">
       <label for="classification_name">Classification Name</label>
       <input
         type="text"
         id="classification_name"
         name="classification_name"
-        value="<%= locals.classification_name || '' %>"
         required
         pattern="[A-Za-z]+"
+        maxlength="50"
+        title="Letters only, no spaces or symbols"
         aria-describedby="c-help"
+        value="<%= typeof classification_name !== 'undefined' ? classification_name : '' %>"
       />
       <small id="c-help" class="muted">Only letters A–Z. No spaces or special characters.</small>
     </div>

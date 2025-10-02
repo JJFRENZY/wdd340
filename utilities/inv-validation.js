@@ -2,30 +2,25 @@
 // Server-side validation & sanitization for Inventory flows
 // Uses express-validator. Also rebuilds sticky form data on error.
 
-const utilities = require("."); // utilities/index.js
+const utilities = require("./index"); // utilities/index.js (explicit is clearer)
 const { body, validationResult } = require("express-validator");
 
 const validate = {};
 
 /* **********************************
  *  Add Classification: rules
- *  - no spaces or special chars; letters only
+ *  - letters only (no spaces/symbols)
  * ********************************* */
-validate.classificationRules = () => {
-  return [
-    body("classification_name")
-      .trim()
-      .escape()
-      .notEmpty()
-      .withMessage("Please provide a classification name.")
-      .bail()
-      .isLength({ min: 2 })
-      .withMessage("Classification name must be at least 2 characters.")
-      .bail()
-      .matches(/^[A-Za-z]+$/)
-      .withMessage("Classification name must contain only letters (no spaces or special characters)."),
-  ];
-};
+validate.classificationRules = () => [
+  body("classification_name")
+    .trim()
+    .escape()
+    .notEmpty().withMessage("Please provide a classification name.")
+    .bail()
+    .isLength({ min: 2 }).withMessage("Classification name must be at least 2 characters.")
+    .bail()
+    .matches(/^[A-Za-z]+$/).withMessage("Letters only (no spaces or special characters)."),
+];
 
 /* ******************************
  * Check classification data
@@ -38,10 +33,11 @@ validate.checkClassificationData = async (req, res, next) => {
   if (!errors.isEmpty()) {
     const nav = await utilities.getNav(req, res, next);
     return res.status(400).render("inventory/add-classification", {
-      title: "Add Classification",
+      title: "Add New Classification",
       nav,
       errors,
-      classification_name, // sticky
+      notice: req.flash("notice"),
+      classification_name: classification_name || "", // sticky
     });
   }
   next();
@@ -49,6 +45,7 @@ validate.checkClassificationData = async (req, res, next) => {
 
 /* **********************************
  *  Add Inventory: rules
+ *  - include type coercion (.toInt/.toFloat)
  * ********************************* */
 validate.inventoryRules = () => {
   const thisYear = new Date().getFullYear();
@@ -57,6 +54,7 @@ validate.inventoryRules = () => {
       .trim()
       .notEmpty().withMessage("Please choose a classification.")
       .bail()
+      .toInt()
       .isInt({ min: 1 }).withMessage("Classification is invalid."),
 
     body("inv_make")
@@ -75,6 +73,7 @@ validate.inventoryRules = () => {
       .trim()
       .notEmpty().withMessage("Please provide a year.")
       .bail()
+      .toInt()
       .isInt({ min: 1886, max: thisYear + 1 })
       .withMessage(`Year must be a 4-digit year between 1886 and ${thisYear + 1}.`),
 
@@ -96,12 +95,14 @@ validate.inventoryRules = () => {
       .trim()
       .notEmpty().withMessage("Please provide a price.")
       .bail()
+      .toFloat()
       .isFloat({ min: 0 }).withMessage("Price must be a positive number."),
 
     body("inv_miles")
       .trim()
       .notEmpty().withMessage("Please provide mileage.")
       .bail()
+      .toInt()
       .isInt({ min: 0 }).withMessage("Mileage must be zero or greater."),
 
     body("inv_color")
@@ -134,31 +135,39 @@ validate.checkInventoryData = async (req, res, next) => {
 
   if (!errors.isEmpty()) {
     const nav = await utilities.getNav(req, res, next);
+
     // Build the select with the previously chosen classification (stickiness)
-    let classificationList = "";
+    let classificationSelect = "";
     try {
-      classificationList = await utilities.buildClassificationList(classification_id);
+      classificationSelect = await utilities.buildClassificationList(classification_id);
     } catch (e) {
       console.error("Failed to build classification select:", e.message || e);
-      classificationList = '<select id="classificationList" name="classification_id" required><option value="">Choose a Classification</option></select>';
+      classificationSelect =
+        '<select id="classificationList" name="classification_id" required>' +
+        "<option value=''>Choose a Classification</option>" +
+        "</select>";
     }
 
     return res.status(400).render("inventory/add-inventory", {
-      title: "Add Inventory",
+      title: "Add New Vehicle",
       nav,
       errors,
+      notice: req.flash("notice"),
+
+      // dynamic select
+      classificationSelect,
 
       // sticky values
-      classificationList,
-      inv_make,
-      inv_model,
-      inv_year,
-      inv_description,
-      inv_image,
-      inv_thumbnail,
-      inv_price,
-      inv_miles,
-      inv_color,
+      inv_make: inv_make || "",
+      inv_model: inv_model || "",
+      inv_year: inv_year || "",
+      inv_description: inv_description || "",
+      inv_image: inv_image || "",
+      inv_thumbnail: inv_thumbnail || "",
+      inv_price: inv_price || "",
+      inv_miles: inv_miles || "",
+      inv_color: inv_color || "",
+      classification_id: classification_id || "",
     });
   }
 

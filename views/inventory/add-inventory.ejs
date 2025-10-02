@@ -30,8 +30,9 @@
         name="inv_make"
         required
         minlength="1"
+        maxlength="50"
         autocomplete="off"
-        value="<%= locals.inv_make || '' %>"
+        value="<%= inv_make || '' %>"
       >
     </div>
 
@@ -43,8 +44,9 @@
         name="inv_model"
         required
         minlength="1"
+        maxlength="50"
         autocomplete="off"
-        value="<%= locals.inv_model || '' %>"
+        value="<%= inv_model || '' %>"
       >
     </div>
 
@@ -59,7 +61,7 @@
         max="<%= new Date().getFullYear() + 1 %>"
         step="1"
         inputmode="numeric"
-        value="<%= locals.inv_year || '' %>"
+        value="<%= inv_year || '' %>"
         aria-describedby="yearHelp"
       >
       <small id="yearHelp" class="muted">Enter a 4-digit year (1886–<%= new Date().getFullYear() + 1 %>).</small>
@@ -75,7 +77,7 @@
         min="0"
         step="0.01"
         inputmode="decimal"
-        value="<%= locals.inv_price || '' %>"
+        value="<%= inv_price || '' %>"
       >
     </div>
 
@@ -89,7 +91,7 @@
         min="0"
         step="1"
         inputmode="numeric"
-        value="<%= locals.inv_miles || '' %>"
+        value="<%= inv_miles || '' %>"
       >
     </div>
 
@@ -100,8 +102,9 @@
         id="inv_color"
         name="inv_color"
         required
+        maxlength="30"
         autocomplete="off"
-        value="<%= locals.inv_color || '' %>"
+        value="<%= inv_color || '' %>"
       >
     </div>
 
@@ -112,7 +115,7 @@
         id="inv_image"
         name="inv_image"
         required
-        value="<%= locals.inv_image || '/images/vehicles/no-image.png' %>"
+        value="<%= inv_image || '/images/vehicles/no-image.png' %>"
         placeholder="/images/vehicles/no-image.png"
       >
       <small class="muted">Use a path within <code>/images/vehicles/</code>.</small>
@@ -125,7 +128,7 @@
         id="inv_thumbnail"
         name="inv_thumbnail"
         required
-        value="<%= locals.inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
+        value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
         placeholder="/images/vehicles/no-image-tn.png"
       >
       <small class="muted">Use a path within <code>/images/vehicles/</code>.</small>
@@ -138,7 +141,7 @@
         name="inv_description"
         rows="4"
         required
-      ><%= (locals.inv_description || '') %></textarea>
+      ><%= (inv_description || '') %></textarea>
     </div>
 
     <button class="btn primary" type="submit">Add Vehicle</button>

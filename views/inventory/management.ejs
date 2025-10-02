@@ -6,14 +6,14 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <div id="messages"><%- messages() %></div>
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
   <!-- (Optional) server-side validation errors -->
-  <% if (errors) { %>
+  <% if (errors && typeof errors.array === 'function' && errors.array().length) { %>
     <ul class="notice" aria-live="polite">
-      <% if (typeof errors.array === 'function') { errors.array().forEach(err => { %>
+      <% errors.array().forEach(err => { %>
         <li><%= err.msg %></li>
-      <% }) } %>
+      <% }) %>
     </ul>
   <% } %>
 
@@ -35,6 +35,26 @@
       </div>
     </li>
   </ul>
+
+  <!-- Manage Inventory (AJAX select + table) -->
+  <section aria-labelledby="manage-heading" style="margin-top:2rem">
+    <h2 id="manage-heading">Manage Inventory</h2>
+    <p>Select a classification to see and manage the items that belong to it.</p>
+
+    <!-- Classification select injected from utilities.buildClassificationList() -->
+    <div class="form-row" style="max-width:480px">
+      <label for="classificationList">Classification</label>
+      <%- classificationSelect %>
+    </div>
+
+    <!-- Results table built by /public/js/inventory.js -->
+    <table id="inventoryDisplay" class="table" style="margin-top:1rem"></table>
+
+    <noscript>JavaScript must be enabled to use this page.</noscript>
+  </section>
 </main>
 
 <%- include('../partials/footer.ejs') %>
+
+<!-- Hook up the AJAX behavior -->
+<script src="/js/inventory.js"></script>
