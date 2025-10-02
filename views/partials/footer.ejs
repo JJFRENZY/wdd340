@@ -1,20 +1,30 @@
 <footer class="site-footer" role="contentinfo">
   <div class="wrap">
-    <p>&copy; <span id="year"></span> CSE Motors. All rights reserved.</p>
+    <p>
+      &copy; <time id="year" datetime="<%= new Date().getFullYear() %>"><%= new Date().getFullYear() %></time>
+      CSE Motors. All rights reserved.
+    </p>
+
     <address>
       1234 Motor Way, Rexburg, ID 83440 ·
       <a href="tel:+12085550123" aria-label="Call CSE Motors">(208) 555-0123</a>
     </address>
 
     <!-- Assignment 3: Task 3 — intentional 500 error trigger -->
-    <p><a href="/inv/boom" rel="nofollow">Trigger 500 Error (test)</a></p>
+    <p>
+      <a href="/inv/boom" rel="nofollow" aria-label="Trigger a test 500 error">
+        Trigger 500 Error (test)
+      </a>
+    </p>
   </div>
 </footer>
 
 <script>
-  // Set year without extra build tools
+  // Keep the displayed year current if the page is cached
   (function () {
-    const el = document.getElementById('year');
-    if (el) el.textContent = new Date().getFullYear();
+    var el = document.getElementById('year');
+    if (el) el.textContent = String(new Date().getFullYear());
   })();
 </script>
+</body>
+</html>

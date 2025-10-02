@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title %> | CSE Motors</title>
-  <meta name="description" content="CSE Motors – quality vehicles, honest service." />
 
-  <!-- Favicon (optional, adjust if your logo file differs) -->
+  <title><%= title ? (title + " | CSE Motors") : "CSE Motors" %></title>
+  <meta name="description" content="CSE Motors – quality vehicles, honest service." />
+  <meta name="color-scheme" content="light dark" />
+
+  <!-- Favicon -->
   <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
 
   <!-- CSS must include media="screen" per assignment -->

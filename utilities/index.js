@@ -62,10 +62,12 @@ Util.buildClassificationGrid = async function (data) {
   if (data && data.length > 0) {
     grid = '<ul id="inv-display">'
     data.forEach((vehicle) => {
+      const detailHref = "/inv/detail/" + vehicle.inv_id // ✅ absolute path
+
       grid += "<li>"
       grid +=
-        '<a href="../../inv/detail/' +
-        vehicle.inv_id +
+        '<a href="' +
+        detailHref +
         '" title="View ' +
         vehicle.inv_make +
         " " +
@@ -81,8 +83,8 @@ Util.buildClassificationGrid = async function (data) {
       grid += "<hr />"
       grid += "<h2>"
       grid +=
-        '<a href="../../inv/detail/' +
-        vehicle.inv_id +
+        '<a href="' +
+        detailHref +
         '" title="View ' +
         vehicle.inv_make +
         " " +
@@ -93,10 +95,7 @@ Util.buildClassificationGrid = async function (data) {
         vehicle.inv_model +
         "</a>"
       grid += "</h2>"
-      grid +=
-        "<span>" +
-        Util.formatUSD(vehicle.inv_price) +
-        "</span>"
+      grid += "<span>" + Util.formatUSD(vehicle.inv_price) + "</span>"
       grid += "</div>"
       grid += "</li>"
     })
