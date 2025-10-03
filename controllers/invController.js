@@ -42,7 +42,6 @@ exports.buildByClassificationId = async function (req, res, next) {
     const nav = await utilities.getNav(req, res, next)
     const grid = await utilities.buildClassificationGrid(rows)
 
-    // Nice title if we have data, otherwise generic
     const title =
       rows && rows.length
         ? `${rows[0].classification_name} Vehicles`
@@ -175,7 +174,7 @@ exports.getInventoryJSON = async (req, res, next) => {
 
     const raw = await invModel.getInventoryByClassificationId(classification_id)
     const invData = Array.isArray(raw) ? raw : raw?.rows || []
-    return res.json(invData) // array (possibly empty)
+    return res.json(invData)
   } catch (err) {
     return next(err)
   }
@@ -194,7 +193,7 @@ exports.buildDetail = async (req, res, next) => {
       throw err
     }
 
-    const vehicle = await invModel.getVehicleById(inv_id) // alias to getInventoryById
+    const vehicle = await invModel.getVehicleById(inv_id)
     if (!vehicle) {
       const err = new Error("Vehicle not found")
       err.status = 404
@@ -203,7 +202,6 @@ exports.buildDetail = async (req, res, next) => {
 
     const title = `${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}`
 
-    // Guard builder so a bad field can't 500 the page
     let vehicleDetail
     try {
       vehicleDetail = utilities.buildVehicleDetailHtml(vehicle)
@@ -222,7 +220,7 @@ exports.buildDetail = async (req, res, next) => {
     return res.render("inventory/detail", {
       title,
       nav,
-      vehicleDetail, // must match the EJS variable name
+      vehicleDetail,
       errors: null,
       notice: req.flash("notice"),
     })
@@ -270,6 +268,98 @@ exports.buildDetailMinimal = async (req, res, next) => {
       <hr />
       <p>If THIS renders, DB + controller are fine; any 500 on /inv/detail/:id comes from EJS/partials.</p>
     `)
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/* ============================
+ * EDIT view: GET /inv/edit/:inv_id
+ * ============================ */
+exports.buildEditInventory = async (req, res, next) => {
+  try {
+    const inv_id = parseInt(req.params.inv_id, 10)
+    if (Number.isNaN(inv_id)) {
+      const err = new Error("Invalid vehicle id")
+      err.status = 400
+      throw err
+    }
+
+    const v = await invModel.getVehicleById(inv_id)
+    if (!v) {
+      const err = new Error("Vehicle not found")
+      err.status = 404
+      throw err
+    }
+
+    const nav = await utilities.getNav(req, res, next)
+    const classificationSelect = await utilities.buildClassificationList(v.classification_id)
+    const title = `Edit ${v.inv_year} ${v.inv_make} ${v.inv_model}`
+
+    return res.render("inventory/edit-inventory", {
+      title,
+      nav,
+      classificationSelect,
+      errors: null,
+      notice: req.flash("notice"),
+      // sticky values
+      inv_id: v.inv_id,
+      inv_make: v.inv_make,
+      inv_model: v.inv_model,
+      inv_year: v.inv_year,
+      inv_description: v.inv_description,
+      inv_image: v.inv_image,
+      inv_thumbnail: v.inv_thumbnail,
+      inv_price: v.inv_price,
+      inv_miles: v.inv_miles,
+      inv_color: v.inv_color,
+      classification_id: v.classification_id,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/* ***************************
+ *  Update Inventory Data
+ *  Route: POST /inv/update
+ * ************************** */
+exports.updateInventory = async function (req, res, next) {
+  try {
+    const nav = await utilities.getNav(req, res, next)
+
+    const payload = {
+      inv_id: req.body.inv_id,
+      inv_make: req.body.inv_make,
+      inv_model: req.body.inv_model,
+      inv_description: req.body.inv_description,
+      inv_image: req.body.inv_image,
+      inv_thumbnail: req.body.inv_thumbnail,
+      inv_price: req.body.inv_price,
+      inv_year: req.body.inv_year,
+      inv_miles: req.body.inv_miles,
+      inv_color: req.body.inv_color,
+      classification_id: req.body.classification_id,
+    }
+
+    const updateResult = await invModel.updateInventory(payload)
+
+    if (updateResult) {
+      const itemName = `${updateResult.inv_make} ${updateResult.inv_model}`
+      req.flash("notice", `The ${itemName} was successfully updated.`)
+      return res.redirect("/inv/")
+    }
+
+    const classificationSelect = await utilities.buildClassificationList(payload.classification_id)
+    const itemName = `${payload.inv_make} ${payload.inv_model}`
+    req.flash("notice", "Sorry, the update failed.")
+    return res.status(400).render("inventory/edit-inventory", {
+      title: `Edit ${payload.inv_year} ${itemName}`,
+      nav,
+      classificationSelect,
+      errors: null,
+      ...payload,
+    })
   } catch (err) {
     return next(err)
   }

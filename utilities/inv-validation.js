@@ -113,8 +113,23 @@ validate.inventoryRules = () => {
   ];
 };
 
+/* **********************************
+ *  Update Inventory: rules
+ *  - require inv_id (int) + reuse inventory rules
+ * ********************************* */
+validate.updateRules = () => [
+  body("inv_id")
+    .trim()
+    .notEmpty().withMessage("Missing item id.")
+    .bail()
+    .toInt()
+    .isInt({ min: 1 }).withMessage("Invalid item id."),
+  // Reuse all the add-inventory rules
+  ...validate.inventoryRules(),
+];
+
 /* ******************************
- * Check inventory data
+ * Check inventory data (ADD)
  * If errors, rebuild classification select & re-render add-inventory
  * ***************************** */
 validate.checkInventoryData = async (req, res, next) => {
@@ -158,6 +173,69 @@ validate.checkInventoryData = async (req, res, next) => {
       classificationSelect,
 
       // sticky values
+      inv_make: inv_make || "",
+      inv_model: inv_model || "",
+      inv_year: inv_year || "",
+      inv_description: inv_description || "",
+      inv_image: inv_image || "",
+      inv_thumbnail: inv_thumbnail || "",
+      inv_price: inv_price || "",
+      inv_miles: inv_miles || "",
+      inv_color: inv_color || "",
+      classification_id: classification_id || "",
+    });
+  }
+
+  next();
+};
+
+/* ******************************
+ * Check update data (EDIT)
+ * If errors, rebuild classification select & re-render edit-inventory
+ * ***************************** */
+validate.checkUpdateData = async (req, res, next) => {
+  const {
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color,
+    classification_id,
+  } = req.body;
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const nav = await utilities.getNav(req, res, next);
+
+    // Rebuild the classification select with stickiness
+    let classificationSelect = "";
+    try {
+      classificationSelect = await utilities.buildClassificationList(classification_id);
+    } catch (e) {
+      console.error("Failed to build classification select:", e.message || e);
+      classificationSelect =
+        '<select id="classificationList" name="classification_id" required>' +
+        "<option value=''>Choose a Classification</option>" +
+        "</select>";
+    }
+
+    const itemName = `${inv_year || ""} ${inv_make || ""} ${inv_model || ""}`.trim();
+
+    return res.status(400).render("inventory/edit-inventory", {
+      title: itemName ? `Edit ${itemName}` : "Edit Vehicle",
+      nav,
+      errors,
+      notice: req.flash("notice"),
+      classificationSelect,
+
+      // sticky fields (including inv_id!)
+      inv_id: inv_id || "",
       inv_make: inv_make || "",
       inv_model: inv_model || "",
       inv_year: inv_year || "",

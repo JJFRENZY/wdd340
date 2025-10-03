@@ -1,0 +1,104 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
+
+  <% if (errors && typeof errors.array === 'function' && errors.array().length) { %>
+    <ul class="notice" aria-live="polite">
+      <% errors.array().forEach(err => { %>
+        <li><%= err.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <form action="/inv/update" method="post" class="form" id="updateForm">
+    <div class="form-row">
+      <label for="classificationList">Classification</label>
+      <%- classificationSelect %>
+    </div>
+
+    <div class="form-row">
+      <label for="inv_make">Make</label>
+      <input
+        type="text" id="inv_make" name="inv_make"
+        required maxlength="50" autocomplete="off"
+        value="<%= inv_make || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_model">Model</label>
+      <input
+        type="text" id="inv_model" name="inv_model"
+        required maxlength="50" autocomplete="off"
+        value="<%= inv_model || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_year">Year</label>
+      <input
+        type="number" id="inv_year" name="inv_year"
+        required min="1886" max="<%= new Date().getFullYear() + 1 %>" step="1"
+        inputmode="numeric" value="<%= inv_year || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_price">Price (USD)</label>
+      <input
+        type="number" id="inv_price" name="inv_price"
+        required min="0" step="0.01" inputmode="decimal"
+        value="<%= inv_price || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_miles">Mileage</label>
+      <input
+        type="number" id="inv_miles" name="inv_miles"
+        required min="0" step="1" inputmode="numeric"
+        value="<%= inv_miles || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_color">Color</label>
+      <input
+        type="text" id="inv_color" name="inv_color"
+        required maxlength="30" autocomplete="off"
+        value="<%= inv_color || '' %>">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_image">Image Path</label>
+      <input
+        type="text" id="inv_image" name="inv_image"
+        required value="<%= inv_image || '/images/vehicles/no-image.png' %>"
+        placeholder="/images/vehicles/no-image.png">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_thumbnail">Thumbnail Path</label>
+      <input
+        type="text" id="inv_thumbnail" name="inv_thumbnail"
+        required value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
+        placeholder="/images/vehicles/no-image-tn.png">
+    </div>
+
+    <div class="form-row">
+      <label for="inv_description">Description</label>
+      <textarea id="inv_description" name="inv_description" rows="4" required><%= (inv_description || '') %></textarea>
+    </div>
+
+    <button class="btn primary" type="submit" disabled>Update Vehicle</button>
+    <a class="btn outline" href="/inv">Cancel</a>
+
+    <!-- Hidden primary key for the update -->
+    <input type="hidden" name="inv_id" value="<%= inv_id %>">
+  </form>
+</main>
+
+<%- include('../partials/footer.ejs') %>
+
+<!-- Enable the Update button on any form change -->
+<script src="/js/inv-update.js"></script>

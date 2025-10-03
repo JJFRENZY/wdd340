@@ -42,4 +42,17 @@ router.post(
   asyncHandler(invController.addInventory)
 )
 
+// ====== Edit/Update Inventory ======
+
+// Step 1: deliver the edit form
+router.get("/edit/:inv_id", asyncHandler(invController.buildEditInventory))
+
+// Step 2: process the update submission
+router.post(
+  "/update",
+  invValidate.inventoryRules(),
+  invValidate.checkUpdateData,
+  asyncHandler(invController.updateInventory)
+)
+
 module.exports = router
