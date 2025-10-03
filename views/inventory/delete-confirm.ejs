@@ -7,7 +7,7 @@
 
   <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
-  <p class="warning"><strong>Confirm Deletion:</strong> This action is permanent and cannot be undone.</p>
+  <p class="notice"><strong>Confirm Deletion:</strong> This action is permanent and cannot be undone.</p>
 
   <form action="/inv/delete" method="post" class="form">
     <div class="form-row">
@@ -27,12 +27,17 @@
 
     <div class="form-row">
       <label for="d_price">Price</label>
-      <input id="d_price" type="text" value="<%= new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(inv_price) %>" readonly>
+      <input
+        id="d_price"
+        type="text"
+        value="<%= new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(inv_price) %>"
+        readonly>
     </div>
 
+    <!-- Hidden primary key -->
     <input type="hidden" name="inv_id" value="<%= inv_id %>">
 
-    <button class="btn danger" type="submit">Delete Vehicle</button>
+    <button class="btn primary" type="submit">Delete Vehicle</button>
     <a class="btn outline" href="/inv">Cancel</a>
   </form>
 </main>

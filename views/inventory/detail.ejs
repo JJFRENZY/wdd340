@@ -5,13 +5,17 @@
 <main id="main" class="container" tabindex="-1">
   <h1 id="veh-h1"><%= title %></h1>
 
-  <!-- Flash messages (optional) -->
-  <div id="messages"><%- messages() %></div>
+  <!-- Flash/messages (guarded) -->
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
   <!-- Vehicle detail block (built in utilities.buildVehicleDetailHtml) -->
   <div class="vehicle-detail-wrap">
     <%- vehicleDetail %>
   </div>
+
+  <p style="margin-top:1rem">
+    <a class="btn outline" href="javascript:history.back()">← Back</a>
+  </p>
 </main>
 
 <%- include('../partials/footer.ejs') %>

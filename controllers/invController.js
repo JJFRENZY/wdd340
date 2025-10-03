@@ -416,12 +416,7 @@ exports.deleteInventory = async (req, res, next) => {
       throw err
     }
 
-    const result = await invModel.deleteInventoryItem(inv_id)
-    const ok =
-      result === 1 ||
-      result === "1" ||
-      (result && typeof result.rowCount === "number" && result.rowCount === 1)
-
+    const ok = await invModel.deleteInventoryItem(inv_id) // boolean from model
     if (ok) {
       req.flash("notice", "The vehicle was successfully deleted.")
       return res.redirect("/inv/")
