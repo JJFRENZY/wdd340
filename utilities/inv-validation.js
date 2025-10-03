@@ -2,7 +2,7 @@
 // Server-side validation & sanitization for Inventory flows
 // Uses express-validator. Also rebuilds sticky form data on error.
 
-const utilities = require("./index"); // utilities/index.js (explicit is clearer)
+const utilities = require("./index"); // utilities/index.js
 const { body, validationResult } = require("express-validator");
 
 const validate = {};
@@ -124,7 +124,6 @@ validate.updateRules = () => [
     .bail()
     .toInt()
     .isInt({ min: 1 }).withMessage("Invalid item id."),
-  // Reuse all the add-inventory rules
   ...validate.inventoryRules(),
 ];
 
@@ -168,8 +167,6 @@ validate.checkInventoryData = async (req, res, next) => {
       nav,
       errors,
       notice: req.flash("notice"),
-
-      // dynamic select
       classificationSelect,
 
       // sticky values
@@ -249,6 +246,28 @@ validate.checkUpdateData = async (req, res, next) => {
     });
   }
 
+  next();
+};
+
+/* **********************************
+ *  OPTIONAL: Delete validation
+ * ********************************* */
+validate.deleteRules = () => [
+  body("inv_id")
+    .trim()
+    .notEmpty().withMessage("Missing item id.")
+    .bail()
+    .toInt()
+    .isInt({ min: 1 }).withMessage("Invalid item id."),
+];
+
+validate.checkDeleteData = async (req, res, next) => {
+  const { inv_id } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash("notice", "Invalid request to delete item.");
+    return res.redirect(`/inv/delete/${inv_id || ""}`);
+  }
   next();
 };
 

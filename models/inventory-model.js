@@ -128,6 +128,7 @@ async function addInventory({
 
 /* ***************************
  *  Update Inventory Data
+ *  (expects an object payload)
  * ************************** */
 async function updateInventory({
   inv_id,
@@ -172,10 +173,25 @@ async function updateInventory({
       inv_id,
     ];
     const { rows } = await pool.query(sql, params);
-    return rows[0];
+    return rows[0] || null;
   } catch (error) {
     console.error("updateInventory error:", error);
     return null;
+  }
+}
+
+/* ***************************
+ *  Delete Inventory Item
+ *  Returns true on success, false on failure
+ * ************************** */
+async function deleteInventoryItem(inv_id) {
+  try {
+    const sql = `DELETE FROM public.inventory WHERE inv_id = $1`;
+    const result = await pool.query(sql, [inv_id]);
+    return result.rowCount === 1;
+  } catch (error) {
+    console.error("deleteInventoryItem error:", error);
+    return false;
   }
 }
 
@@ -185,8 +201,10 @@ module.exports = {
   getInventoryByClassificationId,
   getInventoryById,
   getVehicleById, // alias
+
   // writes
   addClassification,
   addInventory,
-  updateInventory, // ✅ NEW
+  updateInventory,
+  deleteInventoryItem, // ✅ NEW
 };

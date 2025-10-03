@@ -1,0 +1,40 @@
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
+
+  <p class="warning"><strong>Confirm Deletion:</strong> This action is permanent and cannot be undone.</p>
+
+  <form action="/inv/delete" method="post" class="form">
+    <div class="form-row">
+      <label for="d_make">Make</label>
+      <input id="d_make" type="text" value="<%= inv_make %>" readonly>
+    </div>
+
+    <div class="form-row">
+      <label for="d_model">Model</label>
+      <input id="d_model" type="text" value="<%= inv_model %>" readonly>
+    </div>
+
+    <div class="form-row">
+      <label for="d_year">Year</label>
+      <input id="d_year" type="text" value="<%= inv_year %>" readonly>
+    </div>
+
+    <div class="form-row">
+      <label for="d_price">Price</label>
+      <input id="d_price" type="text" value="<%= new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(inv_price) %>" readonly>
+    </div>
+
+    <input type="hidden" name="inv_id" value="<%= inv_id %>">
+
+    <button class="btn danger" type="submit">Delete Vehicle</button>
+    <a class="btn outline" href="/inv">Cancel</a>
+  </form>
+</main>
+
+<%- include('../partials/footer.ejs') %>

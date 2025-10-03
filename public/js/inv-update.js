@@ -1,12 +1,16 @@
-// public/js/inv-update.js
-(function () {
-  const form = document.querySelector("#updateForm");
+'use strict';
+
+// Enables the Update button once the user changes any field.
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('updateForm');
   if (!form) return;
-  const btn = form.querySelector("button[type='submit']");
+
+  const btn = form.querySelector('button[type="submit"]');
   if (!btn) return;
 
-  // Start disabled (view sets disabled attribute)
-  form.addEventListener("change", function () {
-    btn.removeAttribute("disabled");
-  });
-})();
+  const enable = () => btn.removeAttribute('disabled');
+
+  // Enable on first input or change, then stop listening
+  form.addEventListener('input', enable, { once: true });
+  form.addEventListener('change', enable, { once: true });
+});

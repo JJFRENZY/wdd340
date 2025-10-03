@@ -329,7 +329,7 @@ exports.updateInventory = async function (req, res, next) {
     const nav = await utilities.getNav(req, res, next)
 
     const payload = {
-      inv_id: req.body.inv_id,
+      inv_id: parseInt(req.body.inv_id, 10),
       inv_make: req.body.inv_make,
       inv_model: req.body.inv_model,
       inv_description: req.body.inv_description,
@@ -360,6 +360,75 @@ exports.updateInventory = async function (req, res, next) {
       errors: null,
       ...payload,
     })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/* ============================
+ * DELETE confirm view: GET /inv/delete/:inv_id
+ * ============================ */
+exports.buildDeleteConfirm = async (req, res, next) => {
+  try {
+    const inv_id = parseInt(req.params.inv_id, 10)
+    if (Number.isNaN(inv_id)) {
+      const err = new Error("Invalid vehicle id")
+      err.status = 400
+      throw err
+    }
+
+    const v = await invModel.getVehicleById(inv_id)
+    if (!v) {
+      const err = new Error("Vehicle not found")
+      err.status = 404
+      throw err
+    }
+
+    const nav = await utilities.getNav(req, res, next)
+    const title = `Delete ${v.inv_year} ${v.inv_make} ${v.inv_model}`
+
+    return res.render("inventory/delete-confirm", {
+      title,
+      nav,
+      errors: null,
+      notice: req.flash("notice"),
+      inv_id: v.inv_id,
+      inv_make: v.inv_make,
+      inv_model: v.inv_model,
+      inv_year: v.inv_year,
+      inv_price: v.inv_price,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/* ***************************
+ *  Perform Delete
+ *  Route: POST /inv/delete
+ * ************************** */
+exports.deleteInventory = async (req, res, next) => {
+  try {
+    const inv_id = parseInt(req.body.inv_id, 10)
+    if (Number.isNaN(inv_id)) {
+      const err = new Error("Invalid vehicle id")
+      err.status = 400
+      throw err
+    }
+
+    const result = await invModel.deleteInventoryItem(inv_id)
+    const ok =
+      result === 1 ||
+      result === "1" ||
+      (result && typeof result.rowCount === "number" && result.rowCount === 1)
+
+    if (ok) {
+      req.flash("notice", "The vehicle was successfully deleted.")
+      return res.redirect("/inv/")
+    }
+
+    req.flash("notice", "Sorry, the delete failed.")
+    return res.redirect(`/inv/delete/${inv_id}`)
   } catch (err) {
     return next(err)
   }
