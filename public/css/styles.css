@@ -203,3 +203,45 @@ input:focus:invalid { border-color: #b91c1c; /* red-700 */ }
   /* Large screens: side-by-side image + info on detail page */
   .vehicle-detail { grid-template-columns: 1.2fr 1fr; }
 }
+
+/* --- Inventory management table --- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: .5rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  overflow: hidden;
+}
+.table thead th {
+  text-align: left;
+  font-weight: 700;
+  padding: .65rem .75rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.table tbody td {
+  padding: .6rem .75rem;
+  border-top: 1px solid var(--border);
+}
+.table tbody tr:nth-child(even) td {
+  background: #fafafa;
+}
+.table a { text-decoration: underline; }
+.table a:focus-visible { outline: 3px solid var(--outline); outline-offset: 2px; }
+
+/* --- Form parity for select & textarea --- */
+.form-row select,
+.form-row textarea {
+  padding: .6rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  font-size: 1rem;
+}
+.form-row textarea { resize: vertical; }
+
+/* --- Better spec alignment on detail page --- */
+.vehicle-specs {
+  grid-template-columns: max-content 1fr;
+}
