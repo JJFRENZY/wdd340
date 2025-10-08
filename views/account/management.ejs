@@ -1,3 +1,4 @@
+<!-- views/account/management.ejs -->
 <%- include('../partials/head.ejs', { title }) %>
 <%- include('../partials/header.ejs') %>
 <%- include('../partials/nav.ejs', { nav }) %>
@@ -6,7 +7,7 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <div id="messages"><%- messages() %></div>
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
   <!-- (Optional) server-side validation errors -->
   <% if (errors) { %>
@@ -17,21 +18,38 @@
     </ul>
   <% } %>
 
-  <p>
-    You're logged in
-    <% if (typeof accountData !== 'undefined' && accountData && accountData.account_firstname) { %>
-      , <strong><%= accountData.account_firstname %></strong>
-    <% } %>.
-  </p>
+  <%
+    const hasAccount = (typeof accountData !== 'undefined' && accountData);
+    const firstName = hasAccount ? (accountData.account_firstname || '') : '';
+    const isStaff = hasAccount && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin');
+  %>
 
-  <ul class="card-grid" role="list" style="margin-top:1rem">
-    <li class="card">
-      <div class="card-body">
-        <h3>Inventory Management</h3>
-        <p>Manage classifications and vehicles.</p>
-        <a class="btn primary" href="/inv">Open</a>
-      </div>
-    </li>
+  <!-- Greeting per assignment spec -->
+  <% if (firstName) { %>
+    <h2>Welcome <%= firstName %></h2>
+  <% } %>
+
+  <!-- Update account link: always present (above any inventory management section) -->
+  <% if (hasAccount) { %>
+    <p style="margin:.5rem 0 1rem;">
+      <a class="btn outline" href="/account/update/<%= accountData.account_id %>">
+        Update account information
+      </a>
+    </p>
+  <% } %>
+
+  <!-- Cards -->
+  <ul class="card-grid" role="list" style="margin-top:1rem;">
+    <% if (isStaff) { %>
+      <li class="card">
+        <div class="card-body">
+          <h3>Inventory Management</h3>
+          <p>Manage classifications and vehicles.</p>
+          <a class="btn primary" href="/inv">Open</a>
+        </div>
+      </li>
+    <% } %>
+
     <li class="card">
       <div class="card-body">
         <h3>Logout</h3>

@@ -6,65 +6,73 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <div id="messages"><%- messages() %></div>
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
 
   <!-- Validation errors -->
-  <% if (errors) { %>
-    <ul class="notice">
+  <% if (errors && typeof errors.array === 'function' && errors.array().length) { %>
+    <ul class="notice" aria-live="polite">
       <% errors.array().forEach(error => { %>
         <li><%= error.msg %></li>
       <% }) %>
     </ul>
   <% } %>
 
-  <form class="form" action="/account/register" method="post" novalidate>
+  <form id="registerForm" class="form" action="/account/register" method="post">
     <div class="form-row">
-      <label for="accountFirstname">First name</label>
+      <label for="account_firstname">First name</label>
       <input
         type="text"
-        id="accountFirstname"
+        id="account_firstname"
         name="account_firstname"
         required
-        value="<%= locals.account_firstname || '' %>"
+        maxlength="50"
+        autocomplete="given-name"
+        value="<%= (typeof account_firstname !== 'undefined') ? account_firstname : '' %>"
       />
     </div>
 
     <div class="form-row">
-      <label for="accountLastname">Last name</label>
+      <label for="account_lastname">Last name</label>
       <input
         type="text"
-        id="accountLastname"
+        id="account_lastname"
         name="account_lastname"
         required
-        value="<%= locals.account_lastname || '' %>"
+        maxlength="50"
+        autocomplete="family-name"
+        value="<%= (typeof account_lastname !== 'undefined') ? account_lastname : '' %>"
       />
     </div>
 
     <div class="form-row">
-      <label for="accountEmail">Email</label>
+      <label for="account_email">Email</label>
       <input
         type="email"
-        id="accountEmail"
+        id="account_email"
         name="account_email"
         required
+        maxlength="254"
+        autocomplete="email"
         placeholder="you@example.com"
-        value="<%= locals.account_email || '' %>"
+        value="<%= (typeof account_email !== 'undefined') ? account_email : '' %>"
       />
     </div>
 
     <div class="form-row">
-      <label for="accountPassword">Password</label>
-      <div class="notice">
-        Passwords must be at least 12 characters and contain at least 1 number,
-        1 capital letter and 1 special character.
-      </div>
+      <label for="account_password">Password</label>
       <input
         type="password"
-        id="accountPassword"
+        id="account_password"
         name="account_password"
         required
-        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+        minlength="12"
+        autocomplete="new-password"
+        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}"
+        aria-describedby="pwHelp"
       />
+      <p id="pwHelp" class="form-hint">
+        At least 12 characters with upper &amp; lower case, a number, and a symbol.
+      </p>
     </div>
 
     <button class="btn primary" type="submit">Create Account</button>

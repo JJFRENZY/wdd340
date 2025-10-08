@@ -1,22 +1,27 @@
+<!-- views/partials/header.ejs -->
 <header class="site-header" role="banner">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
   <div class="wrap">
     <div class="brand">
       <img class="logo" src="/images/logo.svg" alt="CSE Motors logo" width="48" height="48" />
       <span class="brand-name">CSE Motors</span>
     </div>
 
-    <!-- Secondary header nav: My Account -->
+    <!-- Secondary header nav: Account -->
     <nav aria-label="Account">
       <ul style="list-style:none;display:flex;gap:.75rem;margin:0;padding:0">
         <% if (typeof loggedin !== 'undefined' && loggedin && typeof accountData !== 'undefined' && accountData) { %>
-          <li aria-label="Signed in user">
-            <span>Hi, <strong><%= accountData.account_firstname %></strong></span>
+          <!-- Logged in: show Welcome {firstname} (links to account mgmt) + Logout -->
+          <li>
+            <a href="/account" aria-label="Account management">
+              Welcome <strong><%= accountData.account_firstname %></strong>
+            </a>
           </li>
-          <li><a href="/account/">Account</a></li>
           <li><a href="/account/logout">Logout</a></li>
         <% } else { %>
-          <li><a href="/account/login">Login</a></li>
-          <li><a href="/account/register">Register</a></li>
+          <!-- Logged out: show only My Account (no Logout/Welcome markup present) -->
+          <li><a href="/account/login">My Account</a></li>
         <% } %>
       </ul>
     </nav>
