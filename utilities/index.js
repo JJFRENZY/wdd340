@@ -38,20 +38,27 @@ Util.formatNumber = function (n) {
 Util.getNav = async function (_req, _res, _next) {
   try {
     const data = await invModel.getClassifications()
+
+    // 🔎 Debug: see how many rows are present in production logs
+    const count = (data && Array.isArray(data.rows)) ? data.rows.length : 0
+    console.log(`[getNav] classifications count: ${count}`)
+
     let list = "<ul>"
     list += '<li><a href="/" title="Home page">Home</a></li>'
-    data.rows.forEach((row) => {
-      list += "<li>"
-      list +=
-        '<a href="/inv/type/' +
-        row.classification_id +
-        '" title="See our inventory of ' +
-        row.classification_name +
-        ' vehicles">' +
-        row.classification_name +
-        "</a>"
-      list += "</li>"
-    })
+    if (data && Array.isArray(data.rows)) {
+      data.rows.forEach((row) => {
+        list += "<li>"
+        list +=
+          '<a href="/inv/type/' +
+          row.classification_id +
+          '" title="See our inventory of ' +
+          row.classification_name +
+          ' vehicles">' +
+          row.classification_name +
+          "</a>"
+        list += "</li>"
+      })
+    }
     list += "</ul>"
     return list
   } catch (e) {
@@ -158,20 +165,22 @@ Util.buildClassificationList = async function (classification_id = null) {
     let classificationList =
       '<select name="classification_id" id="classificationList" required>'
     classificationList += "<option value=''>Choose a Classification</option>"
-    data.rows.forEach((row) => {
-      classificationList += '<option value="' + row.classification_id + '"'
-      if (
-        classification_id != null &&
-        Number(row.classification_id) === Number(classification_id)
-      ) {
-        classificationList += " selected"
-      }
-      classificationList += ">" + row.classification_name + "</option>"
-    })
+    if (data && Array.isArray(data.rows)) {
+      data.rows.forEach((row) => {
+        classificationList += '<option value="' + row.classification_id + '"'
+        if (
+          classification_id != null &&
+          Number(row.classification_id) === Number(classification_id)
+        ) {
+          classificationList += " selected"
+        }
+        classificationList += ">" + row.classification_name + "</option>"
+      })
+    }
     classificationList += "</select>"
     return classificationList
   } catch (e) {
-    console.error("buildClassificationList error:", e)
+    console.error("buildClassificationList error:", e?.message || e)
     // Safe fallback so the view still renders
     return `
       <select name="classification_id" id="classificationList" required>
