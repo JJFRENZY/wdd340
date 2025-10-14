@@ -1,3 +1,12 @@
 <nav class="site-nav" aria-label="Primary">
-  <%- nav %>
+  <% if (typeof nav === 'string' && nav.trim().length) { %>
+    <%- nav %>
+  <% } else { %>
+    <!-- Fallback nav when DB-driven list is unavailable -->
+    <ul>
+      <li><a href="/" title="Home page">Home</a></li>
+      <!-- Optional simple link to inventory landing if you want something beyond Home -->
+      <!-- <li><a href="/inv" title="Inventory management">Inventory</a></li> -->
+    </ul>
+  <% } %>
 </nav>
