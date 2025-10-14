@@ -33,25 +33,32 @@ Util.formatNumber = function (n) {
 
 /* ************************
  * Constructs the nav HTML unordered list from DB
+ *  - Fail-soft: if DB/query fails, return a minimal nav so the app doesn’t 500
  ************************** */
 Util.getNav = async function (_req, _res, _next) {
-  const data = await invModel.getClassifications()
-  let list = "<ul>"
-  list += '<li><a href="/" title="Home page">Home</a></li>'
-  data.rows.forEach((row) => {
-    list += "<li>"
-    list +=
-      '<a href="/inv/type/' +
-      row.classification_id +
-      '" title="See our inventory of ' +
-      row.classification_name +
-      ' vehicles">' +
-      row.classification_name +
-      "</a>"
-    list += "</li>"
-  })
-  list += "</ul>"
-  return list
+  try {
+    const data = await invModel.getClassifications()
+    let list = "<ul>"
+    list += '<li><a href="/" title="Home page">Home</a></li>'
+    data.rows.forEach((row) => {
+      list += "<li>"
+      list +=
+        '<a href="/inv/type/' +
+        row.classification_id +
+        '" title="See our inventory of ' +
+        row.classification_name +
+        ' vehicles">' +
+        row.classification_name +
+        "</a>"
+      list += "</li>"
+    })
+    list += "</ul>"
+    return list
+  } catch (e) {
+    console.error("getNav(): falling back due to error:", e?.message || e)
+    // Minimal nav fallback (prevents homepage 500 when DB is empty/missing)
+    return '<ul><li><a href="/" title="Home page">Home</a></li></ul>'
+  }
 }
 
 /* **************************************
