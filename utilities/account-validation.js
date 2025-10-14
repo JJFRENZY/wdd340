@@ -1,5 +1,5 @@
 // utilities/account-validation.js
-const utilities = require("."); // for getNav in error render
+const utilities = require("./index"); // for getNav in error render (FIXED)
 const { body, validationResult } = require("express-validator");
 const accountModel = require("../models/account-model");
 
@@ -150,14 +150,12 @@ validate.updateAccountRules = () => [
     .custom(async (email, { req }) => {
       const currentId = parseInt(req.body.account_id, 10);
 
-      // Prefer a precise lookup if the model provides it
       if (typeof accountModel.getAccountByEmail === "function") {
         const existing = await accountModel.getAccountByEmail(email);
         if (existing && Number(existing.account_id) !== Number(currentId)) {
           throw new Error("Email already in use by another account.");
         }
       } else {
-        // Fallback: basic existence check (may flag unchanged email—best effort)
         const exists = await accountModel.checkExistingEmail(email);
         if (exists) {
           throw new Error("Email already in use.");

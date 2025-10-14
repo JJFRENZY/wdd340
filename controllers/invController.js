@@ -221,6 +221,7 @@ exports.buildDetail = async (req, res, next) => {
       title,
       nav,
       vehicleDetail,
+      vehicle,              // 👈 passed to the template (NEW)
       errors: null,
       notice: req.flash("notice"),
     })

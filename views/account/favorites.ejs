@@ -1,0 +1,39 @@
+<!-- views/account/favorites.ejs -->
+<%- include('../partials/head.ejs', { title }) %>
+<%- include('../partials/header.ejs') %>
+<%- include('../partials/nav.ejs', { nav }) %>
+
+<main id="main" class="container" tabindex="-1">
+  <h1><%= title %></h1>
+
+  <div id="messages"><%- (typeof messages === 'function') ? messages() : '' %></div>
+
+  <% if (!items || !items.length) { %>
+    <p class="notice">You haven’t saved any vehicles yet.</p>
+  <% } else { %>
+    <ul id="inv-display">
+      <% items.forEach(v => { %>
+        <li>
+          <a href="/inv/detail/<%= v.inv_id %>">
+            <img src="<%= v.inv_thumbnail %>" alt="Image of <%= v.inv_year %> <%= v.inv_make %> <%= v.inv_model %>">
+          </a>
+          <div class="namePrice">
+            <hr/>
+            <h2>
+              <a href="/inv/detail/<%= v.inv_id %>">
+                <%= v.inv_year %> <%= v.inv_make %> <%= v.inv_model %>
+              </a>
+            </h2>
+            <span><%= new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(v.inv_price) %></span>
+            <form action="/account/favorites/remove" method="post" style="margin-top:.5rem">
+              <input type="hidden" name="inv_id" value="<%= v.inv_id %>">
+              <button class="btn" type="submit">Remove</button>
+            </form>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</main>
+
+<%- include('../partials/footer.ejs') %>

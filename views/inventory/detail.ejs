@@ -13,6 +13,20 @@
     <%- vehicleDetail %>
   </div>
 
+  <% 
+    const showAdmin =
+      typeof loggedin !== 'undefined' && loggedin &&
+      typeof accountData !== 'undefined' && accountData &&
+      (accountData.account_type === 'Employee' || accountData.account_type === 'Admin') &&
+      typeof vehicle !== 'undefined' && vehicle;
+  %>
+  <% if (showAdmin) { %>
+    <aside class="admin-actions" aria-label="Admin actions" style="margin-top:1rem;display:flex;gap:.5rem;">
+      <a class="btn" href="/inv/edit/<%= vehicle.inv_id %>">Edit</a>
+      <a class="btn danger" href="/inv/delete/<%= vehicle.inv_id %>">Delete</a>
+    </aside>
+  <% } %>
+
   <p style="margin-top:1rem">
     <a class="btn outline" href="javascript:history.back()">← Back</a>
   </p>
