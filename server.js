@@ -1,4 +1,4 @@
-// server.js (CommonJS) — UPDATED with nav middleware
+// server.js (CommonJS) — HARDENED ERROR HANDLER + NAV DEBUG
 "use strict";
 
 const path = require("path");
@@ -12,7 +12,7 @@ const cookieParser = require("cookie-parser");
 
 // Middleware
 const jwtAuth = require("./middleware/jwtAuth");           // sets res.locals.loggedin/accountData
-const navMiddleware = require("./middleware/nav");          // ⬅️ builds res.locals.nav
+const navMiddleware = require("./middleware/nav");          // builds res.locals.nav
 
 // Utilities / controllers / routes
 const asyncHandler = require("./utilities/asyncHandler");
@@ -91,10 +91,10 @@ app.use((req, res, next) => {
  * Auth + Nav (order matters)
  * ====================== */
 app.use(jwtAuth);        // sets res.locals.loggedin / accountData from cookie
-app.use(navMiddleware);  // ⬅️ builds res.locals.nav for all views
+app.use(navMiddleware);  // builds res.locals.nav for all views
 
 /* ======================
- * Health check (optional)
+ * Health check + nav debug
  * ====================== */
 app.get("/healthz", async (_req, res) => {
   try {
@@ -103,6 +103,14 @@ app.get("/healthz", async (_req, res) => {
   } catch (e) {
     res.status(503).json({ ok: false, error: e.code || e.message });
   }
+});
+
+// 🔎 Quick nav debug: see what the middleware put in res.locals.nav
+app.get("/__navdebug", (req, res) => {
+  res.type("html").send(`
+    <h1>nav debug</h1>
+    <pre>${(res.locals.nav || "").replace(/</g, "&lt;")}</pre>
+  `);
 });
 
 /* ======================
@@ -142,15 +150,17 @@ app.use((req, _res, next) => {
 
 /* ======================
  * Central error handler
+ *  - Renders views/errors/error.ejs
+ *  - If that render fails, sends plain text fallback with stack
  * ====================== */
 app.use(async (err, req, res, next) => {
   const status = err.status || 500;
 
   // Log details on server
-  console.error(`Error at "${req.originalUrl}":\n`, err.stack || err.message);
+  console.error(`\n=== Error at "${req.originalUrl}" ===\n`, err.stack || err.message, "\n==============================\n");
 
   // Avoid re-querying DB for nav if the error is clearly DB/DNS
-  const msg = (err && (err.message || "")) + "";
+  const msg = String(err && (err.message || ""));
   const isDbDown =
     err.code === "ENOTFOUND" ||
     /ENOTFOUND|ECONNREFUSED|ECONNRESET|terminated unexpectedly|no pg_hba/i.test(msg);
@@ -158,7 +168,7 @@ app.use(async (err, req, res, next) => {
   let nav = "";
   if (!isDbDown) {
     try {
-      nav = await utilities.getNav(req, res, next);
+      nav = res.locals.nav || (await utilities.getNav(req, res, next));
     } catch (navErr) {
       console.error("Failed to build nav in error handler:", navErr);
     }
@@ -172,12 +182,23 @@ app.use(async (err, req, res, next) => {
   // Only show stack in non-production
   const errForView = process.env.NODE_ENV === "production" ? undefined : err;
 
-  res.status(status).render("errors/error", {
-    title: status,
-    message,
-    nav,
-    err: errForView,
-  });
+  // Try to render the error page. If *that* fails, fall back to plain text.
+  try {
+    return res.status(status).render("errors/error", {
+      title: status,
+      message,
+      nav,
+      err: errForView,
+    });
+  } catch (renderErr) {
+    console.error("Error rendering errors/error.ejs:", renderErr);
+    res
+      .status(status)
+      .type("text")
+      .send(
+        `ERROR ${status}\n\nMessage: ${message}\n\nOriginal:\n${err.stack || err.message}\n\nRender error:\n${renderErr.stack || renderErr.message}`
+      );
+  }
 });
 
 /* ======================
