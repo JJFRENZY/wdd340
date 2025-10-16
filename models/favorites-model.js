@@ -40,3 +40,4 @@ async function isFavorite(account_id, inv_id) {
 }
 
 module.exports = { listByAccount, addFavorite, removeFavorite, isFavorite };
+
