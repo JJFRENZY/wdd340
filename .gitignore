@@ -2,7 +2,9 @@
 node_modules/
 package-lock.json
 yarn.lock
-pnpm-lock.yaml    # keep if you want lockfile tracked; otherwise ignore it
+# Keep the pnpm lockfile committed for reproducible builds
+# (Remove the next line if you previously ignored it)
+# pnpm-lock.yaml
 .pnpm-debug.log*
 npm-debug.log*
 yarn-debug.log*
@@ -11,6 +13,7 @@ yarn-error.log*
 # ── Env / Local Config ────────────────────────────────────
 .env
 .env.*
+!.env.sample
 *.local
 
 # ── Logs / Coverage / Caches ──────────────────────────────
@@ -36,6 +39,5 @@ Thumbs.db
 *.code-workspace
 
 # ── Misc ──────────────────────────────────────────────────
-# Ignore Render/Vercel local artifacts if you generate any
 .vercel/
 .render/

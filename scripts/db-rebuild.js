@@ -1,6 +1,6 @@
 // scripts/db-rebuild.js
 // Runs database/rebuild.sql against the DATABASE_URL connection string.
-// Safe to run multiple times (script uses your idempotent SQL).
+// Safe to run multiple times (your SQL is idempotent).
 
 const { readFileSync } = require("fs");
 const { resolve } = require("path");
@@ -14,7 +14,6 @@ const { Client } = require("pg");
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error("Missing DATABASE_URL environment variable");
 
-    // Respect PGSSLMODE=require if set (Render/Heroku typically need SSL)
     const needSsl =
       /^(require|true)$/i.test(process.env.PGSSLMODE || "") ||
       process.env.NODE_ENV === "production";
