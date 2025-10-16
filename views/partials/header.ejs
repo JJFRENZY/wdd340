@@ -1,7 +1,5 @@
 <!-- views/partials/header.ejs -->
 <header class="site-header" role="banner">
-  <a class="skip-link" href="#main">Skip to main content</a>
-
   <div class="wrap">
     <div class="brand">
       <img class="logo" src="/images/logo.svg" alt="CSE Motors logo" width="48" height="48" />
@@ -9,8 +7,8 @@
     </div>
 
     <!-- Secondary header nav: Account -->
-    <nav aria-label="Account">
-      <ul style="list-style:none;display:flex;gap:.75rem;margin:0;padding:0">
+    <nav class="account-nav" aria-label="Account">
+      <ul>
         <% const hasAcct = typeof accountData !== 'undefined' && accountData; %>
         <% const isLoggedIn = typeof loggedin !== 'undefined' && loggedin && hasAcct; %>
         <% const isStaff = isLoggedIn && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin'); %>

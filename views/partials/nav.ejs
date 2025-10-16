@@ -1,12 +1,33 @@
+<!-- views/partials/nav.ejs -->
 <nav class="site-nav" aria-label="Primary">
+  <% /*
+     If the server built a full HTML string (utilities.getNav), render it as-is.
+     That string already contains <ul>…</ul> with <li><a>…</a></li>.
+  */ %>
   <% if (typeof nav === 'string' && nav.trim().length) { %>
     <%- nav %>
   <% } else { %>
-    <!-- Fallback nav when DB-driven list is unavailable -->
+    <% /* Fallback nav when DB-driven list is unavailable */ %>
+    <% 
+      // Try to detect the current path for accessible highlighting.
+      // Prefer an explicit local like `currentPath`, otherwise try typical Express locals.
+      const _curPath =
+        (typeof currentPath !== 'undefined' && currentPath) ||
+        (typeof path !== 'undefined' && path) ||
+        (typeof req !== 'undefined' && req && req.path) ||
+        (typeof request !== 'undefined' && request && request.path) ||
+        '/';
+      const isHome = _curPath === '/' || _curPath === '';
+    %>
     <ul>
-      <li><a href="/" title="Home page">Home</a></li>
-      <!-- Optional simple link to inventory landing if you want something beyond Home -->
-      <!-- <li><a href="/inv" title="Inventory management">Inventory</a></li> -->
+      <li>
+        <a href="/" title="Home page" <%= isHome ? 'aria-current="page"' : '' %>>
+          Home
+        </a>
+      </li>
+      <% /* Optional: simple inventory landing link if you want more than Home in fallback
+         <li><a href="/inv" title="Inventory management">Inventory</a></li>
+      */ %>
     </ul>
   <% } %>
 </nav>
