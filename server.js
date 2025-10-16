@@ -13,6 +13,7 @@ const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
+const favoritesRoute = require("./routes/favoritesRoute"); // ✅ NEW
 const utilities = require("./utilities"); // for getNav() in error handler
 
 // Load env locally (no-op in prod)
@@ -107,6 +108,9 @@ app.get("/", asyncHandler(baseController.buildHome));
 
 // Accounts (login, register, etc.)
 app.use("/account", accountRoute);
+
+// Favorites (Saved Vehicles) — ✅ NEW
+app.use("/account/favorites", favoritesRoute);
 
 // Inventory (classification, detail, intentional 500)
 app.use("/inv", inventoryRoute);

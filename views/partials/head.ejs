@@ -1,18 +1,27 @@
+<!-- views/partials/head.ejs -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  />
 
   <title><%= title ? (title + " | CSE Motors") : "CSE Motors" %></title>
   <meta name="description" content="CSE Motors – quality vehicles, honest service." />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- Favicon -->
+  <!-- Favicons -->
   <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
 
   <!-- CSS must include media="screen" per assignment -->
   <link rel="stylesheet" href="/css/styles.css" media="screen" />
+
+  <!-- Allow EJS children to inject extra <head> content if needed -->
+  <% if (typeof headExtra !== 'undefined') { %>
+    <%- headExtra %>
+  <% } %>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>

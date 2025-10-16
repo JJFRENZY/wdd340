@@ -11,16 +11,24 @@
     <!-- Secondary header nav: Account -->
     <nav aria-label="Account">
       <ul style="list-style:none;display:flex;gap:.75rem;margin:0;padding:0">
-        <% if (typeof loggedin !== 'undefined' && loggedin && typeof accountData !== 'undefined' && accountData) { %>
-          <!-- Logged in: show Welcome {firstname} (links to account mgmt) + Logout -->
+        <% const hasAcct = typeof accountData !== 'undefined' && accountData; %>
+        <% const isLoggedIn = typeof loggedin !== 'undefined' && loggedin && hasAcct; %>
+        <% const isStaff = isLoggedIn && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin'); %>
+
+        <% if (isLoggedIn) { %>
+          <!-- Logged in: Welcome, Saved, (optional) Inventory, Logout -->
           <li>
             <a href="/account" aria-label="Account management">
               Welcome <strong><%= accountData.account_firstname %></strong>
             </a>
           </li>
+          <li><a href="/account/favorites" aria-label="Saved vehicles">Saved</a></li>
+          <% if (isStaff) { %>
+            <li><a href="/inv" aria-label="Inventory management">Inventory</a></li>
+          <% } %>
           <li><a href="/account/logout">Logout</a></li>
         <% } else { %>
-          <!-- Logged out: show only My Account (no Logout/Welcome markup present) -->
+          <!-- Logged out: only My Account -->
           <li><a href="/account/login">My Account</a></li>
         <% } %>
       </ul>
