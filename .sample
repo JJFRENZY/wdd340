@@ -1,3 +1,14 @@
-# Local server values
+# Server
 PORT=5500
-HOST='localhost'
+HOST=0.0.0.0
+NODE_ENV=development
+
+# Sessions & JWT
+SESSION_SECRET=replace-with-a-long-random-string
+ACCESS_TOKEN_SECRET=replace-with-another-long-random-string
+
+# Database (local dev example)
+# DATABASE_URL=postgres://user:pass@localhost:5432/csemotors
+
+# Hosted Postgres typically needs SSL
+# PGSSLMODE=require
