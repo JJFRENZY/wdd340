@@ -5,29 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('updateForm');
   if (!form) return;
 
-  const submits = Array.from(
-    form.querySelectorAll('button[type="submit"], input[type="submit"]')
-  );
-  if (!submits.length) return;
+  const btn = form.querySelector('button[type="submit"]');
+  if (!btn) return;
 
-  const setEnabled = (on) => {
-    submits.forEach((btn) => {
-      if (on) btn.removeAttribute('disabled');
-      else btn.setAttribute('disabled', 'disabled');
-    });
-  };
+  const enable = () => btn.removeAttribute('disabled');
 
   // Enable on first input or change, then stop listening
-  const enableOnce = () => setEnabled(true);
-  form.addEventListener('input', enableOnce, { once: true });
-  form.addEventListener('change', enableOnce, { once: true });
-
-  // Re-disable after successful submit (prevents double clicks)
-  form.addEventListener('submit', () => setEnabled(false));
-
-  // Re-disable if the form is reset
-  form.addEventListener('reset', () => {
-    // Wait for field values to actually reset
-    setTimeout(() => setEnabled(false), 0);
-  });
+  form.addEventListener('input', enable, { once: true });
+  form.addEventListener('change', enable, { once: true });
 });

@@ -1,10 +1,7 @@
 <footer class="site-footer" role="contentinfo">
   <div class="wrap">
     <p>
-      &copy;
-      <time id="year" datetime="<%= new Date().getFullYear() %>">
-        <%= new Date().getFullYear() %>
-      </time>
+      &copy; <time id="year" datetime="<%= new Date().getFullYear() %>"><%= new Date().getFullYear() %></time>
       CSE Motors. All rights reserved.
     </p>
 
@@ -13,14 +10,12 @@
       <a href="tel:+12085550123" aria-label="Call CSE Motors">(208) 555-0123</a>
     </address>
 
-    <% /* Show the intentional 500 only outside production */ %>
-    <% if (process.env.NODE_ENV !== 'production') { %>
-      <p>
-        <a href="/inv/boom" rel="nofollow" aria-label="Trigger a test 500 error">
-          Trigger 500 Error (test)
-        </a>
-      </p>
-    <% } %>
+    <!-- Assignment 3: Task 3 — intentional 500 error trigger -->
+    <p>
+      <a href="/inv/boom" rel="nofollow" aria-label="Trigger a test 500 error">
+        Trigger 500 Error (test)
+      </a>
+    </p>
   </div>
 </footer>
 

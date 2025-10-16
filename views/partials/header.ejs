@@ -1,5 +1,7 @@
 <!-- views/partials/header.ejs -->
 <header class="site-header" role="banner">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
   <div class="wrap">
     <div class="brand">
       <img class="logo" src="/images/logo.svg" alt="CSE Motors logo" width="48" height="48" />
@@ -7,26 +9,18 @@
     </div>
 
     <!-- Secondary header nav: Account -->
-    <nav class="account-nav" aria-label="Account">
-      <ul>
-        <% const hasAcct = typeof accountData !== 'undefined' && accountData; %>
-        <% const isLoggedIn = typeof loggedin !== 'undefined' && loggedin && hasAcct; %>
-        <% const isStaff = isLoggedIn && (accountData.account_type === 'Employee' || accountData.account_type === 'Admin'); %>
-
-        <% if (isLoggedIn) { %>
-          <!-- Logged in: Welcome, Saved, (optional) Inventory, Logout -->
+    <nav aria-label="Account">
+      <ul style="list-style:none;display:flex;gap:.75rem;margin:0;padding:0">
+        <% if (typeof loggedin !== 'undefined' && loggedin && typeof accountData !== 'undefined' && accountData) { %>
+          <!-- Logged in: show Welcome {firstname} (links to account mgmt) + Logout -->
           <li>
             <a href="/account" aria-label="Account management">
               Welcome <strong><%= accountData.account_firstname %></strong>
             </a>
           </li>
-          <li><a href="/account/favorites" aria-label="Saved vehicles">Saved</a></li>
-          <% if (isStaff) { %>
-            <li><a href="/inv" aria-label="Inventory management">Inventory</a></li>
-          <% } %>
           <li><a href="/account/logout">Logout</a></li>
         <% } else { %>
-          <!-- Logged out: only My Account -->
+          <!-- Logged out: show only My Account (no Logout/Welcome markup present) -->
           <li><a href="/account/login">My Account</a></li>
         <% } %>
       </ul>

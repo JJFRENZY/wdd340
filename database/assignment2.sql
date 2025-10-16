@@ -40,4 +40,3 @@ UPDATE inventory
        inv_thumbnail = REGEXP_REPLACE(inv_thumbnail, '^/images/(?!vehicles/)', '/images/vehicles/')
  WHERE inv_image     LIKE '/images/%'
     OR inv_thumbnail LIKE '/images/%';
-

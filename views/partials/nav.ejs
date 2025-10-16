@@ -1,26 +1,3 @@
-<!-- views/partials/nav.ejs -->
 <nav class="site-nav" aria-label="Primary">
-  <% /*
-     Express merges res.locals into the template locals,
-     so just use `nav` directly. Do NOT reference res.locals in EJS.
-  */ %>
-  <% if (typeof nav === 'string' && nav.trim().length) { %>
-    <%- nav %>
-  <% } else { %>
-    <% /* Minimal fallback if DB/query failed */ %>
-    <% 
-      const _curPath =
-        (typeof currentPath !== 'undefined' && currentPath) ||
-        (typeof path !== 'undefined' && path) ||
-        '/';
-      const isHome = _curPath === '/' || _curPath === '';
-    %>
-    <ul>
-      <li>
-        <a href="/" title="Home page" <%= isHome ? 'aria-current="page"' : '' %>>
-          Home
-        </a>
-      </li>
-    </ul>
-  <% } %>
+  <%- nav %>
 </nav>

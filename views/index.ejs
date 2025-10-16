@@ -2,7 +2,10 @@
 <%- include('partials/header.ejs') %>
 <%- include('partials/nav.ejs', { nav }) %>
 
-<main id="main" class="home" role="main" tabindex="-1">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<main id="main" class="home" tabindex="-1">
+
   <!-- Hero Section -->
   <section class="hero" aria-labelledby="hero-heading">
     <div class="hero-media">
@@ -15,19 +18,17 @@
         fetchpriority="high"
       />
     </div>
-
     <div class="hero-copy">
       <h1 id="hero-heading">Your Next Ride Awaits</h1>
 
       <!-- Flash messages (from session) -->
-      <div id="messages"><%- messages() %></div>
+      <%- messages() %>
 
       <p>Explore our curated selection of cars, trucks, and SUVs. Transparent pricing. Friendly experts.</p>
       <a class="btn primary" href="#inventory" aria-describedby="inv-desc">Browse Inventory</a>
     </div>
   </section>
 
-  <!-- Anchor target for "Browse Inventory" -->
   <div id="inventory" tabindex="-1" aria-describedby="inv-desc"></div>
   <p id="inv-desc" class="sr-only">Jump to the inventory section on this page.</p>
 

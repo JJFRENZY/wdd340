@@ -8,9 +8,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "lint": "echo \"(optional) add your linter here\"",
-    "db:rebuild": "node scripts/db-rebuild.js",
-    "db:seed:classifications": "node scripts/db-seed-classifications.js"
+    "lint": "echo \"(optional) add your linter here\""
   },
   "keywords": [
     "express",
