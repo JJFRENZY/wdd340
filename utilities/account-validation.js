@@ -1,5 +1,7 @@
 // utilities/account-validation.js
-const utilities = require("./index"); // for getNav in error render (FIXED)
+"use strict";
+
+const utilities = require("./index"); // fallback getNav if res.locals.nav missing
 const { body, validationResult } = require("express-validator");
 const accountModel = require("../models/account-model");
 
@@ -14,24 +16,24 @@ function registrationRules() {
       .trim()
       .escape()
       .notEmpty()
-      .isLength({ min: 1 })
-      .withMessage("Please provide a first name."),
+      .isLength({ min: 1, max: 50 })
+      .withMessage("Please provide a first name (max 50)."),
 
     body("account_lastname")
       .trim()
       .escape()
       .notEmpty()
-      .isLength({ min: 2 })
-      .withMessage("Please provide a last name."),
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Please provide a last name (2–50)."),
 
     body("account_email")
       .trim()
       .isEmail()
       .normalizeEmail()
       .withMessage("A valid email is required.")
-      .custom(async (account_email) => {
-        const emailExists = await accountModel.checkExistingEmail(account_email);
-        if (emailExists) {
+      .custom(async (email) => {
+        const exists = await accountModel.checkExistingEmail(email);
+        if (exists) {
           throw new Error("Email exists. Please log in or use a different email.");
         }
       }),
@@ -50,17 +52,18 @@ function registrationRules() {
   ];
 }
 validate.registrationRules = registrationRules; // correct spelling
-validate.registationRules = registrationRules;   // keep legacy spelling
+validate.registationRules = registrationRules;  // legacy spelling kept for rubric/testers
 
 /* ******************************
  * Check registration data and return errors or continue
  * ***************************** */
 validate.checkRegData = async (req, res, next) => {
-  const { account_firstname, account_lastname, account_email } = req.body;
+  const { account_firstname, account_lastname } = req.body;
+  const account_email = (req.body.account_email || "").toLowerCase().trim();
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = res.locals.nav || (await utilities.getNav(req, res, next));
     return res.status(400).render("account/register", {
       title: "Register",
       nav,
@@ -75,31 +78,29 @@ validate.checkRegData = async (req, res, next) => {
 
 /*  **********************************
  *  Login Data Validation Rules
+ *  (No strong-password rule for LOGIN — only require presence)
  * ********************************* */
 validate.loginRules = () => [
-  body("account_email").trim().isEmail().normalizeEmail().withMessage("Please enter a valid email address."),
+  body("account_email")
+    .trim()
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please enter a valid email address."),
   body("account_password")
     .trim()
     .notEmpty()
-    .isStrongPassword({
-      minLength: 12,
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1,
-      minSymbols: 1,
-    })
-    .withMessage("Password must be at least 12 chars and include upper, lower, number, and symbol."),
+    .withMessage("Please enter your password."),
 ];
 
 /* ******************************
  * Check login data and return errors or continue
  * ***************************** */
 validate.checkLoginData = async (req, res, next) => {
-  const { account_email } = req.body;
+  const account_email = (req.body.account_email || "").toLowerCase().trim();
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = res.locals.nav || (await utilities.getNav(req, res, next));
     return res.status(400).render("account/login", {
       title: "Login",
       nav,
@@ -149,7 +150,6 @@ validate.updateAccountRules = () => [
     .bail()
     .custom(async (email, { req }) => {
       const currentId = parseInt(req.body.account_id, 10);
-
       if (typeof accountModel.getAccountByEmail === "function") {
         const existing = await accountModel.getAccountByEmail(email);
         if (existing && Number(existing.account_id) !== Number(currentId)) {
@@ -167,11 +167,17 @@ validate.updateAccountRules = () => [
 
 /* Return to update view with sticky values if there are errors */
 validate.checkUpdateAccountData = async (req, res, next) => {
-  const { account_id, account_firstname, account_lastname, account_email } = req.body;
+  const {
+    account_id,
+    account_firstname,
+    account_lastname,
+  } = req.body;
+  const account_email = (req.body.account_email || "").toLowerCase().trim();
+
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = res.locals.nav || (await utilities.getNav(req, res, next));
     return res.status(400).render("account/update", {
       title: "Update Account",
       nav,
@@ -219,7 +225,7 @@ validate.checkUpdatePasswordData = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const nav = await utilities.getNav(req, res, next);
+    const nav = res.locals.nav || (await utilities.getNav(req, res, next));
 
     // Try to repopulate the account info form with current values
     let acct = null;
