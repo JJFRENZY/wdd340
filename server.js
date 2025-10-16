@@ -1,4 +1,6 @@
-// server.js (CommonJS) — UPDATED
+// server.js (CommonJS) — UPDATED with nav middleware
+"use strict";
+
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
@@ -7,14 +9,18 @@ const pool = require("./database"); // pg.Pool from database/index.js
 const flash = require("connect-flash");
 const messages = require("express-messages");
 const cookieParser = require("cookie-parser");
-const jwtAuth = require("./middleware/jwtAuth"); // <-- use our JWT sanity middleware
 
+// Middleware
+const jwtAuth = require("./middleware/jwtAuth");           // sets res.locals.loggedin/accountData
+const navMiddleware = require("./middleware/nav");          // ⬅️ builds res.locals.nav
+
+// Utilities / controllers / routes
 const asyncHandler = require("./utilities/asyncHandler");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
-const favoritesRoute = require("./routes/favoritesRoute"); // ✅ NEW
-const utilities = require("./utilities"); // for getNav() in error handler
+const favoritesRoute = require("./routes/favoritesRoute"); // saved vehicles
+const utilities = require("./utilities");                   // for getNav() in error handler
 
 // Load env locally (no-op in prod)
 try { require("dotenv").config({ override: true }); } catch (_) {}
@@ -82,10 +88,10 @@ app.use((req, res, next) => {
 });
 
 /* ======================
- * Request-level auth sanity check
- *  - Always sets res.locals.loggedin (boolean) and res.locals.accountData (object|null)
+ * Auth + Nav (order matters)
  * ====================== */
-app.use(jwtAuth);
+app.use(jwtAuth);        // sets res.locals.loggedin / accountData from cookie
+app.use(navMiddleware);  // ⬅️ builds res.locals.nav for all views
 
 /* ======================
  * Health check (optional)
@@ -109,7 +115,7 @@ app.get("/", asyncHandler(baseController.buildHome));
 // Accounts (login, register, etc.)
 app.use("/account", accountRoute);
 
-// Favorites (Saved Vehicles) — ✅ NEW
+// Favorites (Saved Vehicles)
 app.use("/account/favorites", favoritesRoute);
 
 // Inventory (classification, detail, intentional 500)
