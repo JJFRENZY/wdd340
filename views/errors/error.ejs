@@ -1,11 +1,14 @@
-<%- include('../partials/head.ejs', { title }) %>
+<!-- views/errors/error.ejs -->
+<%- include('../partials/head.ejs', { title: (typeof title !== 'undefined' ? title : 'Error') }) %>
 <%- include('../partials/header.ejs') %>
-<%- include('../partials/nav.ejs', { nav }) %>
+<%- include('../partials/nav.ejs') %>
 
 <main id="main" class="error container" tabindex="-1">
-  <h1>Error <%= title %></h1>
+  <h1>Error <%= typeof title !== 'undefined' ? title : '' %></h1>
 
-  <p class="error-msg" role="alert" aria-live="assertive"><%= message %></p>
+  <p class="error-msg" role="alert" aria-live="assertive">
+    <%= typeof message !== 'undefined' ? message : 'Something went wrong.' %>
+  </p>
 
   <p><a class="btn" href="/">← Go Back Home</a></p>
 
@@ -21,7 +24,7 @@
   <% if (typeof err !== 'undefined' && err) { %>
     <details open>
       <summary>Developer details</summary>
-      <pre style="white-space: pre-wrap;"><%= err.stack || err.message %></pre>
+      <pre style="white-space: pre-wrap;"><%= err.stack || err.message || err %></pre>
     </details>
   <% } %>
 </main>
